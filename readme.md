@@ -16,7 +16,7 @@ Vikroriia
 - visual detection with yolo v12, follower mode
   
 Vikroriia
-- control bumbper
+- control bumper
 
 Elias
 - gui in python
@@ -25,4 +25,4 @@ Max
 - LLM voice control
 
 Elias
-- waypoints, automomous, zig zag pattern/tornado pattern
+- waypoints, autonomous, zig-zag pattern/tornado pattern
