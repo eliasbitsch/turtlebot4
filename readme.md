@@ -1,64 +1,72 @@
 # TurtleBot4 — Project Notes
 
-A compact reference for our TurtleBot4 project: Wi‑Fi credentials, connection info, ROS topics, and team tasks.
-
----
+A compact reference for the TurtleBot4 project: Wi‑Fi, connection info, ROS topics, team tasks, and quick simulation steps.
 
 ## Quick Access
 
-- **Wi‑Fi**: `Turtlebot3`
-- **Wi‑Fi Password**: `83974764305522315305`
-- **TurtleBot4 IP**: `192.168.100.100`
-- **SSH**: `ssh ubuntu@192.168.100.100`
-- **SSH Password**: `turtlebot4`
+- Wi‑Fi: `Turtlebot3`  
+- Wi‑Fi password: `83974764305522315305`  
+- TurtleBot4 IP: `192.168.100.100`  
+- SSH: `ssh ubuntu@192.168.100.100`  
+- SSH password: `turtlebot4`
 
 ## Useful ROS topics
 
-- `/scan` — LIDAR scan
-- `/odom` — odometry
+- `/scan` — LIDAR scans  
+- `/odom` — odometry  
 - `/cmd_vel` — velocity commands
 
 ## Team Tasks
 
 ### Philip
-- Connect Xbox controller
-- Implement gmapping (self-written)
+- Connect Xbox controller  
+- Implement gmapping (custom)
 
 ### Ronny
 - SLAM
 
 ### Vikroriia
-- Control bumper
+- Control bumper  
 - Linear control
 
 ### Elias
-- Differential drive controller
-- GUI in Python
+- Differential drive controller  
+- GUI in Python  
 - Waypoints / autonomous patterns (zig-zag, tornado)
 
 ## Nice to have
-
-- Vikroriia: visual detection with YOLO and follower mode
+- Vikroriia: visual detection with YOLO and follower mode  
 - Max: LLM voice control for robot commands
-
----
 
 ## How to connect quickly
 
-1. Ensure your host is on the same network as `192.168.100.0/24`.
+1. Ensure your host is on the same network (192.168.100.0/24).  
 2. SSH into the robot:
+```bash
+ssh ubuntu@192.168.100.100
+# password: turtlebot4
+```
+3. From a machine with ROS 2 installed, monitor topics:
+```bash
+ros2 topic list
+ros2 topic echo /odom
+```
 
-    ```bash
-    ssh ubuntu@192.168.100.100
-    # password: turtlebot4
-    ```
+## Simulation (local / Docker)
 
-3. To monitor topics from your development machine (with ROS set up):
+Clone, build and run the simulation:
+```bash
+git clone https://github.com/eliasbitsch/turtlebot4.git
+cd turtlebot4
+docker compose up -d
 
-    ```bash
-    ros2 topic list
-    ros2 topic echo /odom
-    ```
+# Wait ~10 minutes for services to become ready
+# then enter the dev container:
+docker exec -it turtlebot4-dev bash
 
-
-    
+# Inside the container:
+source /opt/ros/jazzy/setup.bash
+colcon build
+source install/setup.bash
+ros2 launch turtlebot4_sim turtlebot4_sim.launch.py
+```
