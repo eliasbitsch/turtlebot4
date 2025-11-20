@@ -19,23 +19,28 @@ A compact reference for the TurtleBot4 project: Wi‑Fi, connection info, ROS to
 ## Team Tasks
 
 ### Philip
-- Connect Xbox controller  
-- Implement gmapping (custom)
+- Connect Xbox controller
+- Waypoints in map
 
 ### Ronny
-- SLAM
+- mapping/SLAM
+- Map in Rviz
 
-### Vikroriia
+### Viktoriia
 - Control bumper  
 - Linear control
 
 ### Elias
-- Differential drive controller  
-- GUI in Python  
-- Waypoints / autonomous patterns (zig-zag, tornado)
+- Websocket connection
+- topic parser 
+- Valgrind
+
+## Max
+- cmd_vel multi-plexer
+- Wall follower mit ransac / pca
 
 ## Nice to have
-- Vikroriia: visual detection with YOLO and follower mode  
+- Viktoriia: visual detection with YOLO and follower mode  
 - Max: LLM voice control for robot commands
 
 ## How to connect quickly
