@@ -1,11 +1,10 @@
-
-| TurtleBot-Datum      | Strategie                   | Warum?                                    |
-| -------------------- | --------------------------- | ----------------------------------------- |
-| **LaserScan**        | Triple Buffer               | Keine Wartezeiten beim Scannen oder Lesen |
-| **Odometrie**        | SeqLock                     | Viele Leser, wenig beschrieben   |
-| **Bewegungsbefehle** | Double Buffer + Atomic Mode | Zwei Quellen → sichere Umschaltung, keine race condition        |
-| **Karte (/map)**     | Double Buffer + Dirty Flag  | Großes Update → Reader blockiert nie      |
-| **Bumper**           | Interrupt + Atomic          | Sicherheitsreaktion <1ms                  |
+| Topic        | Strategie                   | Buffer-Typ            | Zero Copy möglich? | Vorteile / warum gewählt                                                               |
+| ------------ | --------------------------- | --------------------- | ------------------ | -------------------------------------------------------------------------------------- |
+| **/scan**    | Triple Buffer               | 3 Puffersätze         | ✅ Ja               | Hohe Frequenz (50 Hz), große Daten (8 KB), Zero-Wait für Reader + Writer               |
+| **/odom**    | SeqLock                     | Sequence Lock         | ⚠️ optional        | Kleine Daten (200 B), viele Leser, lock-freies, schnelles Lesen                        |
+| **/cmd_vel** | Double Buffer + Atomic Mode | 2 Puffersätze         | ✅ Ja, optional     | Zwei Writer (Navigation + Teleop), Atomic Mode verhindert Race Conditions              |
+| **/map**     | Double Buffer + Dirty Flag  | 2 Puffersätze         | ✅ Sehr sinnvoll    | Große Daten (4 MB), langsames Update, Reader blockiert nicht, Zero Copy spart Speicher |
+| **/bumper**  | Interrupt + Atomic          | kein Puffersatz nötig | ❌ Nein             | 1 Bit, Sicherheitskritisch, Reaktion <1 ms, Copy irrelevant                            |
 
 
 ###
