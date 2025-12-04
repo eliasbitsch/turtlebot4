@@ -47,11 +47,9 @@ public:
                 }
                 send(msg);
             }
-            // Re-advertise all publishers
-            for (const auto& [topic, info] : publishers_) {
-                json msg = {{"op", "advertise"}, {"topic", topic}, {"type", info.type}};
-                send(msg);
-            }
+            // Advertise cmd_vel directly (workaround for map iteration issue)
+            json adv_msg = {{"op", "advertise"}, {"topic", "/cmd_vel"}, {"type", "geometry_msgs/msg/Twist"}};
+            send(adv_msg);
         });
 
         client_.set_close_handler([this](auto) {
@@ -123,9 +121,11 @@ public:
     }
 
     void advertise(const std::string& topic, const std::string& type, bool best_effort = false) {
+        std::cout << "[Rosbridge] advertise() called: " << topic << " connected=" << connected_ << "\n";
         {
             std::lock_guard<std::mutex> lock(mtx_);
             publishers_[topic] = {type, best_effort};
+            std::cout << "[Rosbridge] publishers_ size=" << publishers_.size() << "\n";
         }
         if (connected_) {
             json msg = {{"op", "advertise"}, {"topic", topic}, {"type", type}};
@@ -195,6 +195,9 @@ public:
 
         running_ = true;
 
+        // Register cmd_vel publisher BEFORE starting WebSocket thread
+        client_.advertise(topics::CMD_VEL, "geometry_msgs/msg/Twist", true);  // best_effort QoS
+
         // WebSocket thread
         ws_thread_ = std::thread([this] {
             while (running_) {
@@ -202,7 +205,6 @@ public:
                     std::this_thread::sleep_for(std::chrono::seconds(2));
                     continue;
                 }
-                client_.advertise(topics::CMD_VEL, "geometry_msgs/msg/Twist", true);  // best_effort QoS
                 client_.run();
                 if (running_) std::this_thread::sleep_for(std::chrono::seconds(1));
             }
