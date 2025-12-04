@@ -1,24 +1,24 @@
-#include <fcntl.h>      // O_RDONLY, O_RDWR
-#include <sys/mman.h>   // mmap, MAP_FAILED
-#include <time.h>       // clock_gettime
-#include <unistd.h>     // read
-#include <stdio.h>      // printf
+// Standalone Joystick -> Shared Memory Controller
+// Writes to SeqLock-protected shared memory compatible with turtlebot4 bridge
 
 typedef unsigned char  u8;
-typedef short          s16;
+typedef unsigned short u16;
 typedef unsigned int   u32;
+typedef short          s16;
 typedef int            s32;
-typedef unsigned long long u64;
+typedef unsigned long  u64;
 
+// --- Joystick Event ---
 struct js_event {
     u32 time;
     s16 value;
-    u8  type;
-    u8  number;
+    u8 type;
+    u8 number;
 };
 
 int is_axis(u8 t) { return t & 2; }
 
+// --- SharedCmdVel Struct (matches turtlebot4::SharedCmdVel) ---
 struct SharedCmdVel {
     double linear_x;
     double linear_y;
@@ -27,115 +27,124 @@ struct SharedCmdVel {
     double angular_y;
     double angular_z;
 
-    s32 timestamp_sec;
-    u32 timestamp_nanosec;
-    u64 sequence;
+    s32  timestamp_sec;
+    u32  timestamp_nanosec;
+    u64  sequence;
     bool new_command;
-
-    SharedCmdVel() {
-        char* p = (char*)this;
-        for (int i = 0; i < (int)sizeof(*this); i++) p[i] = 0;
-    }
 };
 
+// --- SharedBlock with SeqLock (matches turtlebot4::SharedMemory<T>::SharedBlock) ---
+struct SharedBlock {
+    volatile u64 seqlock;  // SeqLock sequence counter (atomic)
+    SharedCmdVel data;
+};
+
+// --- External syscalls ---
+extern "C" int open(const char* path, int flags);
+extern "C" int read(int fd, void* buf, unsigned int count);
+extern "C" int printf(const char*, ...);
+extern "C" int fflush(void*);
+extern "C" int shm_open(const char* name, int oflag, int mode);
+extern "C" int ftruncate(int fd, long length);
+extern "C" void* mmap(void* addr, unsigned long length, int prot, int flags, int fd, long offset);
+extern "C" int clock_gettime(int clk_id, void* ts);
+
+// --- Constants ---
+#define O_RDWR     2
+#define O_CREAT    64
+#define PROT_READ  1
+#define PROT_WRITE 2
+#define MAP_SHARED 1
+#define CLOCK_REALTIME 0
+
+// Memory barrier
+inline void memory_fence() { __sync_synchronize(); }
+
 int main() {
-
-    // -----------------------------
-    // 1) Joystick öffnen
-    // -----------------------------
-    int fd = open("/dev/input/js0", O_RDONLY);
+    // --- 1. Open Joystick ---
+    int fd = open("/dev/input/js0", 0);
     if (fd < 0) {
-        printf("ERROR: Kann /dev/input/js0 nicht öffnen!\n");
-        return 1;
+        fd = open("/dev/input/js1", 0);
+        if (fd < 0) {
+            printf("Error: Cannot open joystick /dev/input/js0 or js1\n");
+            return 1;
+        }
+        printf("Opened /dev/input/js1\n");
+    } else {
+        printf("Opened /dev/input/js0\n");
     }
 
-    // -----------------------------
-    // 2) Shared Memory öffnen
-    // -----------------------------
-    int shm_fd = shm_open("/cmd_vel", O_RDWR, 0666);
-    if (shm_fd < 0) {
-        printf("ERROR: shm_open(/cmd_vel) fehlgeschlagen!\n");
-        return 1;
-    }
-
-    // -----------------------------
-    // 3) Shared Memory mappen
-    // -----------------------------
-    void* p = mmap(
-        NULL,
-        sizeof(SharedCmdVel),
-        PROT_READ | PROT_WRITE,
-        MAP_SHARED,
-        shm_fd,
-        0
-    );
-
-    if (p == MAP_FAILED) {
-        printf("ERROR: mmap() fehlgeschlagen!\n");
-        return 1;
-    }
-
-    SharedCmdVel* shm = (SharedCmdVel*)p;
-
-    // -----------------------------
-    // 4) Variablen & Konstanten
-    // -----------------------------
     s16 axis[8] = {0};
-    const float max_v = 0.4f;
-    const float max_w = 2.0f;
-    const float norm = 32767.0f;
+
+    const float max_v = 0.4f;   // max linear velocity m/s
+    const float max_w = 2.0f;   // max angular velocity rad/s
+    const float norm  = 32767.0f;
     const int deadzone = 3000;
+
+    // --- 2. Open Shared Memory (don't create, bridge creates it) ---
+    int shm_fd = shm_open("/shm_cmd_vel", O_RDWR, 0666);
+    if (shm_fd < 0) {
+        printf("Error: Cannot open /shm_cmd_vel - is the bridge running?\n");
+        return 1;
+    }
+
+    SharedBlock* block = (SharedBlock*)mmap(0, sizeof(SharedBlock), PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
+    if (!block || block == (void*)-1) {
+        printf("Error: mmap failed\n");
+        return 1;
+    }
+
+    printf("Connected to Shared Memory: /shm_cmd_vel (SeqLock format)\n");
+    printf("Controls: Left stick -> linear_x (up/down), angular_z (left/right)\n");
+    printf("          max_v=%.2f m/s, max_w=%.2f rad/s, deadzone=%d\n\n", max_v, max_w, deadzone);
+
     u64 seq = 1;
 
     js_event e;
-    struct timespec ts;
-
-    printf("xbox_teleop gestartet.\n");
-
-    // -----------------------------
-    // 5) Hauptloop
-    // -----------------------------
     while (1) {
+        if (read(fd, &e, sizeof(js_event)) != sizeof(js_event)) continue;
+        if (!is_axis(e.type)) continue;
 
-        int r = read(fd, &e, sizeof(js_event));
-        if (r != sizeof(js_event)) continue;
+        axis[e.number] = e.value;
 
-        // Initialisierungsereignisse überspringen
-        if (e.type & 0x80) continue;
+        float raw_v = axis[1];  // left stick vertical
+        float raw_w = axis[0];  // left stick horizontal
 
-        if (is_axis(e.type)) {
+        // Apply deadzone
+        if (raw_v < deadzone && raw_v > -deadzone) raw_v = 0;
+        if (raw_w < deadzone && raw_w > -deadzone) raw_w = 0;
 
-            axis[e.number] = e.value;
+        float v = -(raw_v / norm) * max_v;  // invert: stick up = forward
+        float w = -(raw_w / norm) * max_w;  // invert: stick left = turn left
 
-            float raw_v = axis[1]; // linker Stick vertikal
-            float raw_w = axis[0]; // linker Stick horizontal
+        // --- 3. Write with SeqLock protocol ---
+        // Increment sequence (odd = write in progress)
+        block->seqlock++;
+        memory_fence();
 
-            // Deadzone
-            if (raw_v < deadzone && raw_v > -deadzone) raw_v = 0;
-            if (raw_w < deadzone && raw_w > -deadzone) raw_w = 0;
+        // Write data
+        block->data.linear_x  = v;
+        block->data.linear_y  = 0;
+        block->data.linear_z  = 0;
+        block->data.angular_x = 0;
+        block->data.angular_y = 0;
+        block->data.angular_z = w;
 
-            float v = -(raw_v / norm) * max_v;
-            float w =  (raw_w / norm) * max_w;
+        // Timestamp
+        struct { long tv_sec; long tv_nsec; } ts;
+        clock_gettime(CLOCK_REALTIME, &ts);
+        block->data.timestamp_sec = ts.tv_sec;
+        block->data.timestamp_nanosec = ts.tv_nsec;
 
-            // Shared Memory füllen
-            shm->linear_x  = v;
-            shm->linear_y  = 0;
-            shm->linear_z  = 0;
+        block->data.sequence = seq++;
+        block->data.new_command = true;
 
-            shm->angular_x = 0;
-            shm->angular_y = 0;
-            shm->angular_z = w;
+        memory_fence();
+        // Increment sequence again (even = write complete)
+        block->seqlock++;
 
-            clock_gettime(CLOCK_REALTIME, &ts);
-
-            shm->timestamp_sec     = ts.tv_sec;
-            shm->timestamp_nanosec = ts.tv_nsec;
-            shm->sequence          = seq++;
-            shm->new_command       = true;
-
-            printf("v=%.3f  w=%.3f  seq=%llu\n", v, w, shm->sequence);
-            fflush(stdout);
-        }
+        printf("\rv=%.3f w=%.3f seq=%lu    ", v, w, seq);
+        fflush(0);
     }
 
     return 0;
