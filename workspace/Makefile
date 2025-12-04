@@ -1,66 +1,44 @@
-# Master Makefile for TurtleBot4 ROS Bridge
-# Builds all modules in correct order
+# TurtleBot4 ROS Bridge - Simplified Build
 
-.PHONY: all clean common rosbridge_client parsers app tools help
+CXX = g++
+CXXFLAGS = -std=c++17 -Wall -Wextra -O2
+INCLUDES = -I./include
+LDFLAGS = -lboost_system -lpthread -lrt
 
-# Build order matters: common -> parsers -> app
-all: common parsers app tools
-	@echo ""
-	@echo "=========================================="
-	@echo "  Build complete!"
-	@echo "=========================================="
-	@echo "  Main app:    bin/turtlebot4_bridge"
-	@echo "  Tools:       bin/shm_monitor"
-	@echo "               bin/cmd_vel_writer"
-	@echo "=========================================="
+BUILD = build
+TARGET = $(BUILD)/turtlebot4_bridge
 
-common:
-	@echo "[BUILD] common"
-	$(MAKE) -C common
+.PHONY: all clean tools help
 
-parsers: common
-	@echo "[BUILD] parsers"
-	$(MAKE) -C parsers
+all: $(TARGET)
+	@echo "Built: $(TARGET)"
 
-rosbridge_client: common
-	@echo "[BUILD] rosbridge_client"
-	$(MAKE) -C rosbridge_client
+$(TARGET): src/main.cpp | $(BUILD)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $< -o $@ $(LDFLAGS)
 
-app: common parsers
-	@echo "[BUILD] app"
-	$(MAKE) -C app
+$(BUILD):
+	@mkdir -p $(BUILD)
 
-tools: common
-	@echo "[BUILD] tools"
-	$(MAKE) -C tools
+# Tools
+tools: $(BUILD)/shm_monitor $(BUILD)/cmd_vel_writer $(BUILD)/test_parsers
+	@echo "Built tools"
+
+$(BUILD)/shm_monitor: tools/shm_monitor.cpp | $(BUILD)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $< -o $@ -lrt -lpthread
+
+$(BUILD)/cmd_vel_writer: tools/cmd_vel_writer.cpp | $(BUILD)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $< -o $@ -lrt -lpthread
+
+$(BUILD)/test_parsers: tools/test_parsers.cpp | $(BUILD)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $< -o $@ -lrt -lpthread
 
 clean:
-	@echo "[CLEAN] all modules"
-	$(MAKE) -C common clean
-	$(MAKE) -C parsers clean
-	$(MAKE) -C rosbridge_client clean
-	$(MAKE) -C app clean
-	$(MAKE) -C tools clean
-	rm -rf bin/*.a bin/turtlebot4_bridge bin/rosbridge_client
+	rm -rf $(BUILD)
 
 help:
-	@echo "TurtleBot4 ROS Bridge Build System"
-	@echo ""
-	@echo "Usage: make [target]"
-	@echo ""
 	@echo "Targets:"
-	@echo "  all              - Build all modules (default)"
-	@echo "  common           - Build common library (datatypes, shared memory)"
-	@echo "  parsers          - Build parser library"
-	@echo "  rosbridge_client - Build standalone rosbridge client"
-	@echo "  app              - Build main application"
-	@echo "  tools            - Build utility tools (shm_monitor, cmd_vel_writer)"
-	@echo "  clean            - Clean all build artifacts"
-	@echo "  help             - Show this help message"
+	@echo "  all    - Build main app (default)"
+	@echo "  tools  - Build shm_monitor + cmd_vel_writer"
+	@echo "  clean  - Remove build artifacts"
 	@echo ""
-	@echo "Dependencies:"
-	@echo "  - libboost-dev (for websocketpp)"
-	@echo "  - nlohmann-json3-dev"
-	@echo ""
-	@echo "Install on Ubuntu/Debian:"
-	@echo "  sudo apt install libboost-all-dev nlohmann-json3-dev"
+	@echo "Dependencies: libboost-all-dev nlohmann-json3-dev"

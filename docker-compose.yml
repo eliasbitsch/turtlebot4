@@ -15,12 +15,15 @@ services:
       - ./:/workspace
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ${HOME}/.Xauthority:/home/ros/.Xauthority:ro
+      - ${HOME}/.ssh:/home/ros/.ssh:ro
+      - /dev/input:/dev/input
 
     environment:
       - DISPLAY=${DISPLAY}
       - ROS_DOMAIN_ID=0
-      # Use FastDDS instead of CycloneDDS (no participant limit)
-      # - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      # TurtleBot4 uses FastRTPS by default - must match for bidirectional comms
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - FASTRTPS_DEFAULT_PROFILES_FILE=/workspace/fastrtps.xml
       - QT_X11_NO_MITSHM=1
 
     user: "ros"

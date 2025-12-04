@@ -50,6 +50,9 @@ RUN apt-get update \
     && apt-get install -y \
         nano vim htop tmux screen \
         bash-completion sudo zsh ros-${ROS_DISTRO}-rosbridge-server libwebsocketpp-dev libboost-system-dev ros-jazzy-navigation2 ros-jazzy-nav2-bringup \
+        openssh-client sshpass \
+        ros-${ROS_DISTRO}-joy ros-${ROS_DISTRO}-teleop-twist-joy \
+        joystick jstest-gtk evtest \
     && rm -rf /var/lib/apt/lists/*
 
 # Create ros user with sudo access (lightweight, may change during development)
