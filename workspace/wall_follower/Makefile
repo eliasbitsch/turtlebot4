@@ -10,8 +10,8 @@ OBJ = $(BUILD)/obj
 TARGET = $(BUILD)/wall_follower
 
 # Source files
-SRCS = src/main_wall_follower.cpp src/wall_follower.cpp src/ransac_processor.cpp
-OBJS = $(OBJ)/main_wall_follower.o $(OBJ)/wall_follower.o $(OBJ)/ransac_processor.o
+SRCS = src/main.cpp src/wall_follower.cpp src/ransac_processor.cpp
+OBJS = $(OBJ)/main.o $(OBJ)/wall_follower.o $(OBJ)/ransac_processor.o
 
 .PHONY: all clean help
 

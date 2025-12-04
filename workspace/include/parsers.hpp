@@ -300,10 +300,21 @@ public:
         : scan_parser_("ScanParser", scan_q, parse_scan)
         , joints_parser_("JointsParser", joints_q, parse_joint_states)
         , bumper_parser_("BumperParser", bumper_q, parse_bumper)
+        , scan_shm_(shm_names::SCAN, true)
         , odom_shm_(shm_names::ODOM, true)
+        , scan_seq_(0)
         , odom_seq_(0)
         , last_stamp_sec_(0)
         , last_stamp_nanosec_(0) {
+
+        // Scan parser writes to shared memory
+        scan_parser_.set_callback([this](const ParsedScan& scan) {
+            // Write scan to shared memory
+            scan_shm_.write(scan);
+            
+            // Call user callback if registered
+            if (scan_callback_) scan_callback_(scan);
+        });
 
         // Joint states parser computes wheel odometry and writes to shared memory
         joints_parser_.set_callback([this](const ParsedJointStates& js) {
@@ -376,7 +387,7 @@ public:
     }
 
     // Callbacks
-    void on_scan(std::function<void(const ParsedScan&)> cb) { scan_parser_.set_callback(cb); }
+    void on_scan(std::function<void(const ParsedScan&)> cb) { scan_callback_ = cb; }
     void on_odom(std::function<void(const ParsedOdom&)> cb) { odom_callback_ = cb; }
     void on_bumper(std::function<void(const ParsedBumper&)> cb) { bumper_parser_.set_callback(cb); }
 
@@ -386,6 +397,7 @@ public:
     uint64_t bumper_count() const { return bumper_parser_.count(); }
 
     // Shared memory access
+    SharedMemory<ParsedScan>& scan_shm() { return scan_shm_; }
     SharedMemory<SharedOdometry>& odom_shm() { return odom_shm_; }
 
 private:
@@ -393,11 +405,14 @@ private:
     ParserThread<ParsedJointStates, decltype(&parse_joint_states)> joints_parser_;
     ParserThread<ParsedBumper, decltype(&parse_bumper)> bumper_parser_;
 
+    SharedMemory<ParsedScan> scan_shm_;
     SharedMemory<SharedOdometry> odom_shm_;
+    uint64_t scan_seq_;
     uint64_t odom_seq_;
     int32_t last_stamp_sec_;
     uint32_t last_stamp_nanosec_;
     WheelOdometry wheel_odom_;
+    std::function<void(const ParsedScan&)> scan_callback_;
     std::function<void(const ParsedOdom&)> odom_callback_;
 };
 

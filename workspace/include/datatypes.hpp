@@ -212,6 +212,7 @@ namespace topics {
 // ============================================================================
 
 namespace shm_names {
+    constexpr const char* SCAN = "/shm_scan";
     constexpr const char* ODOM = "/shm_odom";
     constexpr const char* CMD_VEL = "/shm_cmd_vel";
     constexpr const char* MAP = "/shm_map";
