@@ -41,7 +41,11 @@ struct SharedOdometry {
     // Sequence number for detecting updates
     uint64_t sequence;
 
-    SharedOdometry() { std::memset(this, 0, sizeof(*this)); orientation_w = 1.0; }
+    SharedOdometry() : position_x(0), position_y(0), position_z(0),
+        orientation_x(0), orientation_y(0), orientation_z(0), orientation_w(1.0),
+        linear_velocity_x(0), linear_velocity_y(0), linear_velocity_z(0),
+        angular_velocity_x(0), angular_velocity_y(0), angular_velocity_z(0),
+        timestamp_sec(0), timestamp_nanosec(0), sequence(0) {}
 };
 
 // Shared Memory: Command Velocity (Controller -> RosbridgeClient)
@@ -64,7 +68,9 @@ struct SharedCmdVel {
     // Flag to indicate new command ready
     bool new_command;
 
-    SharedCmdVel() { std::memset(this, 0, sizeof(*this)); }
+    SharedCmdVel() : linear_x(0), linear_y(0), linear_z(0),
+        angular_x(0), angular_y(0), angular_z(0),
+        timestamp_sec(0), timestamp_nanosec(0), sequence(0), new_command(false) {}
 };
 
 // Shared Memory: Occupancy Grid Map (Mapper -> Navigation)
@@ -122,7 +128,11 @@ struct ParsedOdom {
     uint32_t stamp_nanosec;
     bool valid;
 
-    ParsedOdom() : valid(false) { std::memset(this, 0, sizeof(*this)); orientation_w = 1.0; }
+    ParsedOdom() : position_x(0), position_y(0), position_z(0),
+        orientation_x(0), orientation_y(0), orientation_z(0), orientation_w(1.0),
+        linear_vel_x(0), linear_vel_y(0), linear_vel_z(0),
+        angular_vel_x(0), angular_vel_y(0), angular_vel_z(0),
+        stamp_sec(0), stamp_nanosec(0), valid(false) {}
 };
 
 struct ParsedScan {
@@ -143,7 +153,9 @@ struct ParsedScan {
 
     bool valid;
 
-    ParsedScan() : valid(false), num_ranges(0) { std::memset(this, 0, sizeof(*this)); }
+    ParsedScan() : angle_min(0), angle_max(0), angle_increment(0),
+        time_increment(0), scan_time(0), range_min(0), range_max(0),
+        stamp_sec(0), stamp_nanosec(0), ranges{}, num_ranges(0), valid(false) {}
 };
 
 struct ParsedBumper {
@@ -162,7 +174,24 @@ struct ParsedCmdVel {
     uint32_t stamp_nanosec;
     bool valid;
 
-    ParsedCmdVel() : valid(false) { std::memset(this, 0, sizeof(*this)); }
+    ParsedCmdVel() : linear_x(0), linear_y(0), linear_z(0),
+        angular_x(0), angular_y(0), angular_z(0),
+        stamp_sec(0), stamp_nanosec(0), valid(false) {}
+};
+
+// JointStates from /joint_states topic (wheel encoder data)
+struct ParsedJointStates {
+    double left_wheel_position;   // radians
+    double right_wheel_position;  // radians
+    bool wheel_drop_left;         // cliff sensor
+    bool wheel_drop_right;        // cliff sensor
+    int32_t stamp_sec;
+    uint32_t stamp_nanosec;
+    bool valid;
+
+    ParsedJointStates() : left_wheel_position(0), right_wheel_position(0),
+        wheel_drop_left(false), wheel_drop_right(false),
+        stamp_sec(0), stamp_nanosec(0), valid(false) {}
 };
 
 // ============================================================================
@@ -172,8 +201,9 @@ struct ParsedCmdVel {
 namespace topics {
     constexpr const char* SCAN = "/scan";
     constexpr const char* ODOM = "/odom";
-    constexpr const char* CMD_VEL = "/cmd_vel";
-    constexpr const char* BUMPER = "/bumper";
+    constexpr const char* JOINT_STATES = "/joint_states";  // Wheel encoder data (VOLATILE QoS)
+    constexpr const char* CMD_VEL = "/cmd_vel";  // motion_control subscribes with BEST_EFFORT/VOLATILE QoS
+    constexpr const char* HAZARD_DETECTION = "/hazard_detection";
     constexpr const char* MAP = "/map";
 }
 

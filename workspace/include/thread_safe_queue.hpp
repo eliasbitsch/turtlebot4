@@ -6,6 +6,7 @@
 #include <condition_variable>
 #include <optional>
 #include <chrono>
+#include <stdexcept>
 
 namespace turtlebot4 {
 
