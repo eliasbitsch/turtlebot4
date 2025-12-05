@@ -295,93 +295,81 @@ private:
 class Parsers {
 public:
     Parsers(ThreadSafeQueue<std::string>& scan_q,
+            ThreadSafeQueue<std::string>& odom_q,
             ThreadSafeQueue<std::string>& joints_q,
             ThreadSafeQueue<std::string>& bumper_q)
         : scan_parser_("ScanParser", scan_q, parse_scan)
+        , odom_parser_("OdomParser", odom_q, parse_odom)
         , joints_parser_("JointsParser", joints_q, parse_joint_states)
         , bumper_parser_("BumperParser", bumper_q, parse_bumper)
         , scan_shm_(shm_names::SCAN, true)
         , odom_shm_(shm_names::ODOM, true)
-        , scan_seq_(0)
+        , scan_shm_(shm_names::SCAN, true)
         , odom_seq_(0)
-        , last_stamp_sec_(0)
-        , last_stamp_nanosec_(0) {
+        , scan_seq_(0) {
 
         // Scan parser writes to shared memory
         scan_parser_.set_callback([this](const ParsedScan& scan) {
-            // Write scan to shared memory
-            scan_shm_.write(scan);
-            
-            // Call user callback if registered
-            if (scan_callback_) scan_callback_(scan);
+            scan_shm_.update([this, &scan](SharedScan& shm) {
+                shm.angle_min = scan.angle_min;
+                shm.angle_max = scan.angle_max;
+                shm.angle_increment = scan.angle_increment;
+                shm.range_min = scan.range_min;
+                shm.range_max = scan.range_max;
+                shm.timestamp_sec = scan.stamp_sec;
+                shm.timestamp_nanosec = scan.stamp_nanosec;
+                shm.num_ranges = scan.num_ranges;
+                std::memcpy(shm.ranges, scan.ranges, scan.num_ranges * sizeof(float));
+                shm.sequence = ++scan_seq_;
+            });
+
+            if (scan_callback_) {
+                scan_callback_(scan);
+            }
         });
 
-        // Joint states parser computes wheel odometry and writes to shared memory
-        joints_parser_.set_callback([this](const ParsedJointStates& js) {
-            // Compute dt
-            double dt = 0;
-            if (last_stamp_sec_ > 0) {
-                double t1 = last_stamp_sec_ + last_stamp_nanosec_ * 1e-9;
-                double t2 = js.stamp_sec + js.stamp_nanosec * 1e-9;
-                dt = t2 - t1;
-            }
-            last_stamp_sec_ = js.stamp_sec;
-            last_stamp_nanosec_ = js.stamp_nanosec;
-
-            // Update wheel odometry
-            double vx, wz;
-            wheel_odom_.update(js.left_wheel_position, js.right_wheel_position, dt, vx, wz);
-
+        // Odom parser writes directly to shared memory from /odom topic
+        odom_parser_.set_callback([this](const ParsedOdom& odom) {
             // Write to shared memory
-            odom_shm_.update([this, &js, vx, wz](SharedOdometry& shm) {
-                shm.position_x = wheel_odom_.x();
-                shm.position_y = wheel_odom_.y();
-                shm.position_z = 0;
+            odom_shm_.update([this, &odom](SharedOdometry& shm) {
+                shm.position_x = odom.position_x;
+                shm.position_y = odom.position_y;
+                shm.position_z = odom.position_z;
 
-                // Quaternion from yaw angle
-                double half_theta = wheel_odom_.theta() / 2.0;
-                shm.orientation_x = 0;
-                shm.orientation_y = 0;
-                shm.orientation_z = std::sin(half_theta);
-                shm.orientation_w = std::cos(half_theta);
+                shm.orientation_x = odom.orientation_x;
+                shm.orientation_y = odom.orientation_y;
+                shm.orientation_z = odom.orientation_z;
+                shm.orientation_w = odom.orientation_w;
 
-                shm.linear_velocity_x = vx;
-                shm.linear_velocity_y = 0;
-                shm.linear_velocity_z = 0;
-                shm.angular_velocity_x = 0;
-                shm.angular_velocity_y = 0;
-                shm.angular_velocity_z = wz;
+                shm.linear_velocity_x = odom.linear_vel_x;
+                shm.linear_velocity_y = odom.linear_vel_y;
+                shm.linear_velocity_z = odom.linear_vel_z;
+                shm.angular_velocity_x = odom.angular_vel_x;
+                shm.angular_velocity_y = odom.angular_vel_y;
+                shm.angular_velocity_z = odom.angular_vel_z;
 
-                shm.timestamp_sec = js.stamp_sec;
-                shm.timestamp_nanosec = js.stamp_nanosec;
+                shm.timestamp_sec = odom.stamp_sec;
+                shm.timestamp_nanosec = odom.stamp_nanosec;
                 shm.sequence = ++odom_seq_;
             });
 
-            // Call user callback with converted odom
+            // Call user callback
             if (odom_callback_) {
-                ParsedOdom o;
-                o.position_x = wheel_odom_.x();
-                o.position_y = wheel_odom_.y();
-                o.orientation_z = std::sin(wheel_odom_.theta() / 2.0);
-                o.orientation_w = std::cos(wheel_odom_.theta() / 2.0);
-                o.linear_vel_x = vx;
-                o.angular_vel_z = wz;
-                o.stamp_sec = js.stamp_sec;
-                o.stamp_nanosec = js.stamp_nanosec;
-                o.valid = true;
-                odom_callback_(o);
+                odom_callback_(odom);
             }
         });
     }
 
     void start() {
         scan_parser_.start();
+        odom_parser_.start();
         joints_parser_.start();
         bumper_parser_.start();
     }
 
     void stop() {
         scan_parser_.stop();
+        odom_parser_.stop();
         joints_parser_.stop();
         bumper_parser_.stop();
     }
@@ -389,31 +377,33 @@ public:
     // Callbacks
     void on_scan(std::function<void(const ParsedScan&)> cb) { scan_callback_ = cb; }
     void on_odom(std::function<void(const ParsedOdom&)> cb) { odom_callback_ = cb; }
+    void on_joints(std::function<void(const ParsedJointStates&)> cb) { joints_parser_.set_callback(cb); }
     void on_bumper(std::function<void(const ParsedBumper&)> cb) { bumper_parser_.set_callback(cb); }
 
     // Stats
     uint64_t scan_count() const { return scan_parser_.count(); }
-    uint64_t odom_count() const { return joints_parser_.count(); }  // Now from joint_states
+    uint64_t odom_count() const { return odom_parser_.count(); }
+    uint64_t joints_count() const { return joints_parser_.count(); }
     uint64_t bumper_count() const { return bumper_parser_.count(); }
 
     // Shared memory access
     SharedMemory<ParsedScan>& scan_shm() { return scan_shm_; }
     SharedMemory<SharedOdometry>& odom_shm() { return odom_shm_; }
+    SharedMemory<SharedScan>& scan_shm() { return scan_shm_; }
 
 private:
     ParserThread<ParsedScan, decltype(&parse_scan)> scan_parser_;
+    ParserThread<ParsedOdom, decltype(&parse_odom)> odom_parser_;
     ParserThread<ParsedJointStates, decltype(&parse_joint_states)> joints_parser_;
     ParserThread<ParsedBumper, decltype(&parse_bumper)> bumper_parser_;
 
     SharedMemory<ParsedScan> scan_shm_;
     SharedMemory<SharedOdometry> odom_shm_;
-    uint64_t scan_seq_;
+    SharedMemory<SharedScan> scan_shm_;
     uint64_t odom_seq_;
-    int32_t last_stamp_sec_;
-    uint32_t last_stamp_nanosec_;
-    WheelOdometry wheel_odom_;
-    std::function<void(const ParsedScan&)> scan_callback_;
+    uint64_t scan_seq_;
     std::function<void(const ParsedOdom&)> odom_callback_;
+    std::function<void(const ParsedScan&)> scan_callback_;
 };
 
 } // namespace turtlebot4
