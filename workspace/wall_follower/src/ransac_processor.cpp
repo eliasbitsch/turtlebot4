@@ -31,7 +31,7 @@ double distance_squared(const Point& p, const Line& line) {
 std::vector<Point> convert_scan_to_points(const SharedScan& scan) {
     std::vector<Point> data;
     
-    if (scan.num_ranges == 0 || !scan.valid || scan.angle_increment <= 0.0f) {
+    if (scan.num_ranges == 0 || scan.angle_increment <= 0.0f) {
         return data;
     }
 
@@ -141,8 +141,7 @@ void process_scan_with_ransac(const SharedScan& raw_scan_data, WallFollower* fol
     // Debug: Show raw scan info
     static int debug_counter = 0;
     if (++debug_counter % 20 == 0) {
-        std::cout << "\n[DEBUG] Raw scan: valid=" << raw_scan_data.valid 
-                  << " num_ranges=" << raw_scan_data.num_ranges
+        std::cout << "\n[DEBUG] Raw scan: num_ranges=" << raw_scan_data.num_ranges
                   << " angle_min=" << raw_scan_data.angle_min
                   << " angle_max=" << (raw_scan_data.angle_min + raw_scan_data.num_ranges * raw_scan_data.angle_increment)
                   << "\n";
