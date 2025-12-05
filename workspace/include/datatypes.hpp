@@ -73,6 +73,33 @@ struct SharedCmdVel {
         timestamp_sec(0), timestamp_nanosec(0), sequence(0), new_command(false) {}
 };
 
+// Shared Memory: Laser Scan (ScanParser -> Mapper/Navigation)
+// Name: /shm_scan
+struct SharedScan {
+    // Scan metadata
+    float angle_min;
+    float angle_max;
+    float angle_increment;
+    float range_min;
+    float range_max;
+
+    // Timestamp
+    int32_t timestamp_sec;
+    uint32_t timestamp_nanosec;
+
+    // Sequence number for detecting updates
+    uint64_t sequence;
+
+    // Range data (720 points typical for TurtleBot4 LIDAR)
+    static constexpr size_t MAX_RANGES = 2048;
+    float ranges[MAX_RANGES];
+    size_t num_ranges;
+
+    SharedScan() : angle_min(0), angle_max(0), angle_increment(0),
+        range_min(0), range_max(0), timestamp_sec(0), timestamp_nanosec(0),
+        sequence(0), ranges{}, num_ranges(0) {}
+};
+
 // Shared Memory: Occupancy Grid Map (Mapper -> Navigation)
 // Name: /shm_map
 constexpr uint32_t MAP_MAX_WIDTH = 1024;
@@ -213,6 +240,7 @@ namespace topics {
 
 namespace shm_names {
     constexpr const char* ODOM = "/shm_odom";
+    constexpr const char* SCAN = "/shm_scan";
     constexpr const char* CMD_VEL = "/shm_cmd_vel";
     constexpr const char* MAP = "/shm_map";
 }

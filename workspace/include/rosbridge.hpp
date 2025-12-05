@@ -183,7 +183,7 @@ public:
         // Subscribe to topics → push JSON to queues
         client_.subscribe(topics::SCAN, [this](auto&, const json& m) {
             scan_queue_.push(m.dump());
-        }, false);  // reliable QoS for scan
+        }, true);  // best_effort QoS for scan (matches LIDAR default)
         client_.subscribe(topics::ODOM, [this](auto&, const json& m) {
             odom_queue_.push(m.dump());
         }, false);  // Subscribe to /odom directly for robot pose

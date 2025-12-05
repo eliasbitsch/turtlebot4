@@ -303,7 +303,29 @@ public:
         , joints_parser_("JointsParser", joints_q, parse_joint_states)
         , bumper_parser_("BumperParser", bumper_q, parse_bumper)
         , odom_shm_(shm_names::ODOM, true)
-        , odom_seq_(0) {
+        , scan_shm_(shm_names::SCAN, true)
+        , odom_seq_(0)
+        , scan_seq_(0) {
+
+        // Scan parser writes to shared memory
+        scan_parser_.set_callback([this](const ParsedScan& scan) {
+            scan_shm_.update([this, &scan](SharedScan& shm) {
+                shm.angle_min = scan.angle_min;
+                shm.angle_max = scan.angle_max;
+                shm.angle_increment = scan.angle_increment;
+                shm.range_min = scan.range_min;
+                shm.range_max = scan.range_max;
+                shm.timestamp_sec = scan.stamp_sec;
+                shm.timestamp_nanosec = scan.stamp_nanosec;
+                shm.num_ranges = scan.num_ranges;
+                std::memcpy(shm.ranges, scan.ranges, scan.num_ranges * sizeof(float));
+                shm.sequence = ++scan_seq_;
+            });
+
+            if (scan_callback_) {
+                scan_callback_(scan);
+            }
+        });
 
         // Odom parser writes directly to shared memory from /odom topic
         odom_parser_.set_callback([this](const ParsedOdom& odom) {
@@ -352,7 +374,7 @@ public:
     }
 
     // Callbacks
-    void on_scan(std::function<void(const ParsedScan&)> cb) { scan_parser_.set_callback(cb); }
+    void on_scan(std::function<void(const ParsedScan&)> cb) { scan_callback_ = cb; }
     void on_odom(std::function<void(const ParsedOdom&)> cb) { odom_callback_ = cb; }
     void on_joints(std::function<void(const ParsedJointStates&)> cb) { joints_parser_.set_callback(cb); }
     void on_bumper(std::function<void(const ParsedBumper&)> cb) { bumper_parser_.set_callback(cb); }
@@ -365,6 +387,7 @@ public:
 
     // Shared memory access
     SharedMemory<SharedOdometry>& odom_shm() { return odom_shm_; }
+    SharedMemory<SharedScan>& scan_shm() { return scan_shm_; }
 
 private:
     ParserThread<ParsedScan, decltype(&parse_scan)> scan_parser_;
@@ -373,8 +396,11 @@ private:
     ParserThread<ParsedBumper, decltype(&parse_bumper)> bumper_parser_;
 
     SharedMemory<SharedOdometry> odom_shm_;
+    SharedMemory<SharedScan> scan_shm_;
     uint64_t odom_seq_;
+    uint64_t scan_seq_;
     std::function<void(const ParsedOdom&)> odom_callback_;
+    std::function<void(const ParsedScan&)> scan_callback_;
 };
 
 } // namespace turtlebot4

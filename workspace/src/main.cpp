@@ -42,10 +42,21 @@ int main(int argc, char* argv[]) {
         if (b.is_pressed) std::cout << "\n[BUMPER] Hit!\n";
     });
 
+    // Debug: Print scan info every 10th message
+    static int scan_debug_counter = 0;
+    parsers.on_scan([](const turtlebot4::ParsedScan& s) {
+        if (++scan_debug_counter % 10 == 0) {
+            std::cout << "\n[SCAN] ranges=" << s.num_ranges
+                      << " min=" << s.range_min << "m max=" << s.range_max << "m"
+                      << " first=" << (s.num_ranges > 0 ? s.ranges[0] : 0) << "m\n";
+        }
+    });
+
     parsers.start();
 
     std::cout << "Shared Memory:\n";
     std::cout << "  " << turtlebot4::shm_names::ODOM << "\n";
+    std::cout << "  " << turtlebot4::shm_names::SCAN << "\n";
     std::cout << "  " << turtlebot4::shm_names::CMD_VEL << "\n";
     std::cout << "\nRunning... Ctrl+C to stop\n\n";
 
