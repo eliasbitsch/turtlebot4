@@ -30,10 +30,10 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // Start parsers (3 threads)
-    // Note: Using joint_states instead of odom due to TRANSIENT_LOCAL QoS issues
+    // Start parsers (4 threads: scan, odom, joints, bumper)
     turtlebot4::Parsers parsers(
         bridge.scan_queue(),
+        bridge.odom_queue(),
         bridge.joints_queue(),
         bridge.bumper_queue()
     );

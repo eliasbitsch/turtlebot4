@@ -12,10 +12,10 @@ int main() {
     std::cout << "=== Parser + SharedMemory Test ===\n\n";
 
     // Queues (normalerweise von RobotBridge befüllt)
-    turtlebot4::ThreadSafeQueue<std::string> scan_q, joints_q, bumper_q;
+    turtlebot4::ThreadSafeQueue<std::string> scan_q, odom_q, joints_q, bumper_q;
 
-    // Parsers starten (now using joint_states for odom)
-    turtlebot4::Parsers parsers(scan_q, joints_q, bumper_q);
+    // Parsers starten (now using /odom directly)
+    turtlebot4::Parsers parsers(scan_q, odom_q, joints_q, bumper_q);
 
     parsers.on_scan([](const turtlebot4::ParsedScan& s) {
         std::cout << "[SCAN] " << s.num_ranges << " ranges, min=" << s.range_min << "\n";
@@ -36,30 +36,17 @@ int main() {
     // Simuliere eingehende JSON-Nachrichten
     std::cout << "Sending test messages...\n\n";
 
-    // Test JointStates - simulate wheel movement
-    // Format: TurtleBot4's /joint_states message
-    joints_q.push(R"({
+    // Test Odom - simulate robot pose from /odom topic
+    odom_q.push(R"({
         "header": {"stamp": {"sec": 100, "nanosec": 0}},
-        "name": ["wheel_drop_left_joint", "left_wheel_joint", "wheel_drop_right_joint", "right_wheel_joint"],
-        "position": [0.0, 0.0, 0.0, 0.0]
-    })");
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
-    // Simulate forward motion: both wheels move 1 radian (about 0.036m)
-    joints_q.push(R"({
-        "header": {"stamp": {"sec": 100, "nanosec": 100000000}},
-        "name": ["wheel_drop_left_joint", "left_wheel_joint", "wheel_drop_right_joint", "right_wheel_joint"],
-        "position": [0.0, 1.0, 0.0, 1.0]
-    })");
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
-    // Simulate turn: right wheel moves more than left
-    joints_q.push(R"({
-        "header": {"stamp": {"sec": 100, "nanosec": 200000000}},
-        "name": ["wheel_drop_left_joint", "left_wheel_joint", "wheel_drop_right_joint", "right_wheel_joint"],
-        "position": [0.0, 1.5, 0.0, 2.0]
+        "pose": {"pose": {
+            "position": {"x": 0.5, "y": 0.3, "z": 0.0},
+            "orientation": {"x": 0.0, "y": 0.0, "z": 0.1, "w": 0.995}
+        }},
+        "twist": {"twist": {
+            "linear": {"x": 0.1, "y": 0.0, "z": 0.0},
+            "angular": {"x": 0.0, "y": 0.0, "z": 0.2}
+        }}
     })");
 
     // Test Scan
@@ -81,7 +68,7 @@ int main() {
 
     std::cout << "\n--- Stats ---\n";
     std::cout << "Scan:   " << parsers.scan_count() << " messages\n";
-    std::cout << "Odom:   " << parsers.odom_count() << " messages (from joint_states)\n";
+    std::cout << "Odom:   " << parsers.odom_count() << " messages\n";
     std::cout << "Bumper: " << parsers.bumper_count() << " messages\n";
 
     // Test SharedMemory lesen (Zero-Copy!)

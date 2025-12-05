@@ -181,14 +181,15 @@ public:
 
     bool start() {
         // Subscribe to topics → push JSON to queues
-        // Note: TurtleBot4 uses TRANSIENT_LOCAL for /odom which doesn't work well
-        // with rosbridge, so we use /joint_states (VOLATILE) and compute odometry
         client_.subscribe(topics::SCAN, [this](auto&, const json& m) {
             scan_queue_.push(m.dump());
-        }, false);  // reliable QoS for scan (TurtleBot4 uses RELIABLE+VOLATILE)
+        }, false);  // reliable QoS for scan
+        client_.subscribe(topics::ODOM, [this](auto&, const json& m) {
+            odom_queue_.push(m.dump());
+        }, false);  // Subscribe to /odom directly for robot pose
         client_.subscribe(topics::JOINT_STATES, [this](auto&, const json& m) {
             joints_queue_.push(m.dump());
-        }, false);  // reliable QoS for joint_states (VOLATILE durability works!)
+        }, false);  // reliable QoS for joint_states
         client_.subscribe(topics::HAZARD_DETECTION, [this](auto&, const json& m) {
             bumper_queue_.push(m.dump());
         }, true);  // best_effort for hazard detection
@@ -253,6 +254,7 @@ public:
         if (!running_) return;
         running_ = false;
         scan_queue_.shutdown();
+        odom_queue_.shutdown();
         joints_queue_.shutdown();
         bumper_queue_.shutdown();
         client_.stop();
@@ -265,6 +267,7 @@ public:
 
     // Queues for parsers
     ThreadSafeQueue<std::string>& scan_queue() { return scan_queue_; }
+    ThreadSafeQueue<std::string>& odom_queue() { return odom_queue_; }
     ThreadSafeQueue<std::string>& joints_queue() { return joints_queue_; }
     ThreadSafeQueue<std::string>& bumper_queue() { return bumper_queue_; }
 
@@ -278,6 +281,7 @@ private:
     uint64_t last_seq_;
 
     ThreadSafeQueue<std::string> scan_queue_;
+    ThreadSafeQueue<std::string> odom_queue_;
     ThreadSafeQueue<std::string> joints_queue_;
     ThreadSafeQueue<std::string> bumper_queue_;
 
