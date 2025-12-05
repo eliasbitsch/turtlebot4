@@ -1,0 +1,733 @@
+========================================
+  TurtleBot4 Wall Follower (RANSAC)    
+========================================
+
+[WallFollower] Connected to shared memory segments:
+  - /shm_scan
+  - /shm_odom
+  - /shm_cmd_vel
+
+[WallFollower] Initialized. Target distance: 0.4m.
+[WallFollower] Running... Press Ctrl+C to stop
+
+[Control] Distance to wall: 0.417748m | Angle error: -21.2213° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417936m | Angle error: -20.9252° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418195m | Angle error: -20.9089° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417894m | Angle error: -21.16° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417894m | Angle error: -21.16° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417877m | Angle error: -20.918° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417509m | Angle error: -21.132° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418068m | Angle error: -20.7961° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417681m | Angle error: -21.1261° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417681m | Angle error: -21.1261° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418224m | Angle error: -20.9205° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41773m | Angle error: -21.1656° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418018m | Angle error: -20.9447° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41834m | Angle error: -20.8784° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41812m | Angle error: -20.9034° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417721m | Angle error: -21.1196° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418163m | Angle error: -20.8976° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418163m | Angle error: -20.8976° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418192m | Angle error: -20.9019° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417812m | Angle error: -21.1204° | Front clearance: 0.132m
+[Loop 20] Processing scans...[Control] Distance to wall: 0.417812m | Angle error: -21.1204° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418395m | Angle error: -20.8804° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418395m | Angle error: -20.8804° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418395m | Angle error: -20.8804° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418442m | Angle error: -20.8888° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418123m | Angle error: -21.1126° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418123m | Angle error: -21.1126° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418646m | Angle error: -20.8834° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418646m | Angle error: -20.8834° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418355m | Angle error: -20.9001° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418355m | Angle error: -20.9001° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418355m | Angle error: -20.9001° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418383m | Angle error: -20.9062° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417993m | Angle error: -21.1247° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418604m | Angle error: -20.8811° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418113m | Angle error: -20.8871° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418113m | Angle error: -20.8871° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418113m | Angle error: -20.8871° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418219m | Angle error: -20.8948° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417588m | Angle error: -21.1352° | Front clearance: 0.132m
+[Loop 40] Processing scans...[Control] Distance to wall: 0.41871m | Angle error: -20.5701° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417902m | Angle error: -21.1168° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417999m | Angle error: -21.1335° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418219m | Angle error: -20.8769° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418518m | Angle error: -20.9422° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418518m | Angle error: -20.9422° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418394m | Angle error: -21.2089° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418506m | Angle error: -21.2269° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417822m | Angle error: -20.9241° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417822m | Angle error: -20.9241° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417445m | Angle error: -21.1497° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418285m | Angle error: -21.0643° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418422m | Angle error: -20.8802° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418147m | Angle error: -21.1133° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418182m | Angle error: -20.9167° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418115m | Angle error: -21.2186° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418182m | Angle error: -20.9167° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417782m | Angle error: -21.139° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417901m | Angle error: -20.8486° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418188m | Angle error: -20.5475° | Front clearance: 0.132m
+[Loop 60] Processing scans...[Control] Distance to wall: 0.418419m | Angle error: -20.6143° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418419m | Angle error: -20.6143° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418634m | Angle error: -20.7905° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418483m | Angle error: -20.8555° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417886m | Angle error: -21.1144° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418539m | Angle error: -20.5478° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418338m | Angle error: -20.5726° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418539m | Angle error: -20.5478° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418416m | Angle error: -20.9023° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418193m | Angle error: -21.2096° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418153m | Angle error: -21.2649° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418341m | Angle error: -21.2725° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418236m | Angle error: -21.2557° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418406m | Angle error: -20.8335° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41865m | Angle error: -20.802° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418406m | Angle error: -20.8335° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418331m | Angle error: -20.9435° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418331m | Angle error: -20.9435° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418331m | Angle error: -20.9435° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417919m | Angle error: -21.122° | Front clearance: 0.132m
+[Loop 80] Processing scans...[Control] Distance to wall: 0.417919m | Angle error: -21.122° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417919m | Angle error: -21.122° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41849m | Angle error: -21.206° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418137m | Angle error: -21.2191° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418338m | Angle error: -20.9103° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418338m | Angle error: -20.9103° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418338m | Angle error: -20.9103° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418754m | Angle error: -20.813° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418754m | Angle error: -20.813° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41901m | Angle error: -20.7816° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41865m | Angle error: -20.8143° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418142m | Angle error: -21.1034° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418028m | Angle error: -20.591° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418085m | Angle error: -21.1515° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418422m | Angle error: -20.9281° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418326m | Angle error: -20.9513° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417961m | Angle error: -21.1761° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418019m | Angle error: -20.8849° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418973m | Angle error: -20.8389° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418973m | Angle error: -20.8389° | Front clearance: 0.132m
+[Loop 100] Processing scans...[Control] Distance to wall: 0.418724m | Angle error: -20.8681° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418547m | Angle error: -21.2226° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418547m | Angle error: -21.2226° | Front clearance: 0.132m
+[Control] Distance to wall: 0.419171m | Angle error: -21.0937° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418925m | Angle error: -20.8532° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418151m | Angle error: -21.1668° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418136m | Angle error: -21.213° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418136m | Angle error: -21.213° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417861m | Angle error: -20.9423° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418094m | Angle error: -20.9211° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417926m | Angle error: -21.1718° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418094m | Angle error: -20.9211° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418475m | Angle error: -20.5447° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418475m | Angle error: -20.5447° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418273m | Angle error: -20.5696° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418315m | Angle error: -20.7796° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418231m | Angle error: -20.58° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418299m | Angle error: -21.2008° | Front clearance: 0.132m
+[Control] Distance to wall: 0.4182m | Angle error: -21.1815° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418534m | Angle error: -20.8365° | Front clearance: 0.132m
+[Loop 120] Processing scans...[Control] Distance to wall: 0.418476m | Angle error: -20.5339° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418044m | Angle error: -20.8211° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418283m | Angle error: -20.5585° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418442m | Angle error: -21.1123° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418564m | Angle error: -20.9236° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418363m | Angle error: -20.9244° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417825m | Angle error: -21.1686° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418151m | Angle error: -20.9487° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417908m | Angle error: -21.1139° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418411m | Angle error: -20.9287° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418411m | Angle error: -20.9287° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418319m | Angle error: -20.9324° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41837m | Angle error: -21.2484° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418329m | Angle error: -21.1663° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41843m | Angle error: -21.1853° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418734m | Angle error: -20.9452° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418907m | Angle error: -20.865° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418659m | Angle error: -21.0779° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41915m | Angle error: -20.8349° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418169m | Angle error: -20.9369° | Front clearance: 0.132m
+[Loop 140] Processing scans...[Control] Distance to wall: 0.418169m | Angle error: -20.9369° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418055m | Angle error: -21.1894° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418935m | Angle error: -20.7861° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418685m | Angle error: -20.8175° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41768m | Angle error: -21.1436° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41768m | Angle error: -21.1436° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418084m | Angle error: -20.9297° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418364m | Angle error: -20.9° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418364m | Angle error: -20.9° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418364m | Angle error: -20.9° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418228m | Angle error: -20.9115° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418228m | Angle error: -20.9115° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417975m | Angle error: -21.1063° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41854m | Angle error: -20.8542° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417975m | Angle error: -21.1063° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418262m | Angle error: -20.9457° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417968m | Angle error: -20.9793° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418262m | Angle error: -20.9457° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418025m | Angle error: -21.1229° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418344m | Angle error: -20.9014° | Front clearance: 0.132m
+[Loop 160] Processing scans...[Control] Distance to wall: 0.418025m | Angle error: -21.1229° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418442m | Angle error: -21.2194° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418442m | Angle error: -21.2194° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418431m | Angle error: -20.8283° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418682m | Angle error: -20.7975° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418431m | Angle error: -20.8283° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417846m | Angle error: -21.0967° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418397m | Angle error: -20.8491° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418397m | Angle error: -20.8491° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418201m | Angle error: -21.152° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418297m | Angle error: -21.1395° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418688m | Angle error: -20.8602° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417874m | Angle error: -21.1558° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418148m | Angle error: -20.9326° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418515m | Angle error: -20.9082° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418515m | Angle error: -20.9082° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418055m | Angle error: -21.1581° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418555m | Angle error: -20.9052° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418579m | Angle error: -20.5919° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41826m | Angle error: -20.8415° | Front clearance: 0.132m
+[Loop 180] Processing scans...[Control] Distance to wall: 0.41802m | Angle error: -21.097° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41802m | Angle error: -21.097° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418557m | Angle error: -20.5498° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418358m | Angle error: -20.5749° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418557m | Angle error: -20.5498° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418765m | Angle error: -20.8162° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418473m | Angle error: -20.6006° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418473m | Angle error: -20.6006° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418689m | Angle error: -20.5757° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418116m | Angle error: -21.1041° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418689m | Angle error: -20.5757° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417675m | Angle error: -21.1273° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418077m | Angle error: -20.9145° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417951m | Angle error: -20.7837° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418007m | Angle error: -20.967° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417951m | Angle error: -20.7837° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417914m | Angle error: -21.0648° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418385m | Angle error: -20.8207° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418385m | Angle error: -20.8207° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418198m | Angle error: -20.9046° | Front clearance: 0.132m
+[Loop 200] Processing scans...[Control] Distance to wall: 0.417828m | Angle error: -21.1194° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417265m | Angle error: -21.1422° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417335m | Angle error: -21.133° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417335m | Angle error: -21.133° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417955m | Angle error: -20.9597° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41765m | Angle error: -21.1854° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417955m | Angle error: -20.9597° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418091m | Angle error: -20.8717° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417971m | Angle error: -21.1553° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418943m | Angle error: -20.806° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418694m | Angle error: -20.8367° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418636m | Angle error: -20.5912° | Front clearance: 0.132m
+[Control] Distance to wall: 0.419154m | Angle error: -20.8529° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418272m | Angle error: -21.1708° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418631m | Angle error: -20.9461° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418901m | Angle error: -20.8196° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418657m | Angle error: -20.8498° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418657m | Angle error: -20.8498° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418775m | Angle error: -20.8468° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418775m | Angle error: -20.8468° | Front clearance: 0.132m
+[Loop 220] Processing scans...[Control] Distance to wall: 0.418333m | Angle error: -20.9139° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418081m | Angle error: -21.1433° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418081m | Angle error: -21.1433° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418247m | Angle error: -20.9041° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417845m | Angle error: -21.125° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418247m | Angle error: -20.9041° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418072m | Angle error: -21.1791° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418159m | Angle error: -21.1942° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418072m | Angle error: -21.1791° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418516m | Angle error: -20.6083° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418157m | Angle error: -21.1125° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418491m | Angle error: -20.8832° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418491m | Angle error: -20.8832° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418491m | Angle error: -20.8832° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418488m | Angle error: -20.8574° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418488m | Angle error: -20.8574° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418488m | Angle error: -20.8574° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418571m | Angle error: -20.8829° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418285m | Angle error: -21.0138° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418108m | Angle error: -20.9071° | Front clearance: 0.132m
+[Loop 240] Processing scans...[Control] Distance to wall: 0.418108m | Angle error: -20.9071° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418108m | Angle error: -20.9071° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417989m | Angle error: -21.1749° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418487m | Angle error: -21.0086° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417989m | Angle error: -21.1749° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418426m | Angle error: -20.5867° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418502m | Angle error: -20.8361° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418426m | Angle error: -20.5921° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418627m | Angle error: -20.5684° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418627m | Angle error: -20.5684° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418926m | Angle error: -20.9525° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418603m | Angle error: -20.8395° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418603m | Angle error: -20.8395° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418003m | Angle error: -21.216° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418146m | Angle error: -20.916° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418545m | Angle error: -20.8905° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41837m | Angle error: -21.1368° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418545m | Angle error: -20.8905° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418491m | Angle error: -20.8801° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41797m | Angle error: -21.1268° | Front clearance: 0.132m
+[Loop 260] Processing scans...[Control] Distance to wall: 0.41828m | Angle error: -20.9054° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418119m | Angle error: -21.103° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418579m | Angle error: -20.8509° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418815m | Angle error: -20.8203° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418652m | Angle error: -20.8705° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418652m | Angle error: -20.8705° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418652m | Angle error: -20.8705° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417939m | Angle error: -21.2111° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417939m | Angle error: -21.2111° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418305m | Angle error: -20.8303° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418305m | Angle error: -20.8303° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418305m | Angle error: -20.8303° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418565m | Angle error: -20.862° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418565m | Angle error: -20.862° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418565m | Angle error: -20.862° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418025m | Angle error: -20.9187° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418025m | Angle error: -20.9187° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418375m | Angle error: -20.5845° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417815m | Angle error: -21.1147° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418304m | Angle error: -20.9223° | Front clearance: 0.132m
+[Loop 280] Processing scans...[Control] Distance to wall: 0.418097m | Angle error: -20.9152° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417736m | Angle error: -21.1322° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417736m | Angle error: -21.1322° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417538m | Angle error: -21.1556° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418432m | Angle error: -20.8329° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417926m | Angle error: -20.9269° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418344m | Angle error: -20.8445° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417496m | Angle error: -21.1605° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418806m | Angle error: -20.8766° | Front clearance: 0.133m
+[Control] Distance to wall: 0.418238m | Angle error: -21.12° | Front clearance: 0.133m
+[Control] Distance to wall: 0.418806m | Angle error: -20.8766° | Front clearance: 0.133m
+[Control] Distance to wall: 0.418379m | Angle error: -20.8371° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418379m | Angle error: -20.8371° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418544m | Angle error: -20.5506° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418768m | Angle error: -20.8518° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418711m | Angle error: -20.6069° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418333m | Angle error: -20.7553° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418524m | Angle error: -20.5645° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418524m | Angle error: -20.5645° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417788m | Angle error: -21.1336° | Front clearance: 0.132m
+[Loop 300] Processing scans...[Control] Distance to wall: 0.417788m | Angle error: -21.1336° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417889m | Angle error: -21.1513° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418256m | Angle error: -20.8608° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418256m | Angle error: -20.8608° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417735m | Angle error: -21.1105° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418026m | Angle error: -20.9199° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418026m | Angle error: -20.9199° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418156m | Angle error: -21.177° | Front clearance: 0.133m
+[Control] Distance to wall: 0.418156m | Angle error: -21.177° | Front clearance: 0.133m
+[Control] Distance to wall: 0.418064m | Angle error: -21.1871° | Front clearance: 0.133m
+[Control] Distance to wall: 0.418931m | Angle error: -20.8087° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418681m | Angle error: -20.8394° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418681m | Angle error: -20.8394° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418231m | Angle error: -20.9124° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417886m | Angle error: -20.9516° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418231m | Angle error: -20.9124° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418348m | Angle error: -20.8397° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418348m | Angle error: -20.8397° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418279m | Angle error: -20.9197° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418279m | Angle error: -20.9197° | Front clearance: 0.132m
+[Loop 320] Processing scans...[Control] Distance to wall: 0.417921m | Angle error: -21.133° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418003m | Angle error: -20.846° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41837m | Angle error: -20.9693° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418135m | Angle error: -20.9018° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418344m | Angle error: -20.5763° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418155m | Angle error: -20.7847° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418344m | Angle error: -20.5763° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417997m | Angle error: -21.1535° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417997m | Angle error: -21.1535° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417997m | Angle error: -21.1535° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418291m | Angle error: -20.802° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417831m | Angle error: -21.1456° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418592m | Angle error: -20.8441° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41884m | Angle error: -20.813° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418592m | Angle error: -20.8441° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41831m | Angle error: -20.8451° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41831m | Angle error: -20.8451° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417838m | Angle error: -21.1022° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417914m | Angle error: -21.1811° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418025m | Angle error: -20.9295° | Front clearance: 0.132m
+[Loop 340] Processing scans...[Control] Distance to wall: 0.418511m | Angle error: -20.9491° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418511m | Angle error: -20.9491° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418511m | Angle error: -20.9491° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417939m | Angle error: -20.8558° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417748m | Angle error: -21.1255° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418165m | Angle error: -20.5858° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418373m | Angle error: -21.2123° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418124m | Angle error: -21.1318° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418373m | Angle error: -21.2123° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418365m | Angle error: -20.9237° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418365m | Angle error: -20.9237° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418226m | Angle error: -20.904° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417885m | Angle error: -21.1274° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418226m | Angle error: -20.904° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418683m | Angle error: -20.7714° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41834m | Angle error: -21.1245° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418805m | Angle error: -20.6364° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418842m | Angle error: -20.8281° | Front clearance: 0.132m
+[Control] Distance to wall: 0.419092m | Angle error: -20.7977° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418842m | Angle error: -20.8281° | Front clearance: 0.132m
+[Loop 360] Processing scans...[Control] Distance to wall: 0.417754m | Angle error: -21.1287° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418176m | Angle error: -20.9105° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418171m | Angle error: -21.1689° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418171m | Angle error: -21.1689° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41848m | Angle error: -20.9493° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418049m | Angle error: -21.1194° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418572m | Angle error: -20.8705° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418572m | Angle error: -20.8705° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418443m | Angle error: -20.5545° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418443m | Angle error: -20.5545° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418248m | Angle error: -20.5791° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418694m | Angle error: -20.8552° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418264m | Angle error: -21.1309° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418264m | Angle error: -21.1309° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418046m | Angle error: -21.1122° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418554m | Angle error: -20.8615° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418554m | Angle error: -20.8615° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418385m | Angle error: -20.8365° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418385m | Angle error: -20.8365° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417919m | Angle error: -21.092° | Front clearance: 0.132m
+[Loop 380] Processing scans...[Control] Distance to wall: 0.417708m | Angle error: -21.1718° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417708m | Angle error: -21.1718° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417708m | Angle error: -21.1718° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418116m | Angle error: -21.1612° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418245m | Angle error: -20.9159° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418942m | Angle error: -20.8657° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41904m | Angle error: -20.8931° | Front clearance: 0.132m
+[Control] Distance to wall: 0.419195m | Angle error: -20.8352° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418014m | Angle error: -20.8883° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418322m | Angle error: -20.544° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418014m | Angle error: -20.8883° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418756m | Angle error: -20.8678° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418756m | Angle error: -20.8678° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418508m | Angle error: -20.5667° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418508m | Angle error: -20.5667° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418508m | Angle error: -20.5667° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418746m | Angle error: -20.5599° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418027m | Angle error: -21.0661° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418746m | Angle error: -20.5599° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418006m | Angle error: -20.8464° | Front clearance: 0.132m
+[Loop 400] Processing scans...[Control] Distance to wall: 0.417997m | Angle error: -21.1533° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418006m | Angle error: -20.8464° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418029m | Angle error: -21.0933° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418525m | Angle error: -20.8431° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418234m | Angle error: -20.588° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418234m | Angle error: -20.588° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418234m | Angle error: -20.588° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418418m | Angle error: -20.9603° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418005m | Angle error: -20.8471° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417916m | Angle error: -21.1362° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418822m | Angle error: -21.1902° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418571m | Angle error: -21.2189° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41802m | Angle error: -20.9143° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41802m | Angle error: -20.9143° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418235m | Angle error: -20.889° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417955m | Angle error: -21.1171° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41828m | Angle error: -20.9024° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41828m | Angle error: -20.9024° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418905m | Angle error: -20.8213° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418607m | Angle error: -20.8923° | Front clearance: 0.132m
+[Loop 420] Processing scans...[Control] Distance to wall: 0.41806m | Angle error: -21.1362° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418636m | Angle error: -20.8901° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418427m | Angle error: -20.9144° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418117m | Angle error: -21.2339° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418117m | Angle error: -21.2339° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418779m | Angle error: -21.1106° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418024m | Angle error: -20.9105° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418024m | Angle error: -20.9105° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418024m | Angle error: -20.9105° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418218m | Angle error: -20.5886° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418218m | Angle error: -20.5886° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418218m | Angle error: -20.5886° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418296m | Angle error: -20.8503° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418296m | Angle error: -20.8503° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418296m | Angle error: -20.8503° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417758m | Angle error: -20.9659° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418047m | Angle error: -20.9324° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417859m | Angle error: -21.0115° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418431m | Angle error: -20.6088° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418431m | Angle error: -20.6088° | Front clearance: 0.132m
+[Loop 440] Processing scans...[Control] Distance to wall: 0.418522m | Angle error: -20.8809° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418306m | Angle error: -20.9058° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418306m | Angle error: -20.9058° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418012m | Angle error: -21.0814° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418348m | Angle error: -20.5773° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418332m | Angle error: -20.7441° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418571m | Angle error: -20.8776° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418076m | Angle error: -20.939° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417763m | Angle error: -21.1837° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417763m | Angle error: -21.1837° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418125m | Angle error: -20.9614° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417763m | Angle error: -21.1837° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418385m | Angle error: -20.8536° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41834m | Angle error: -21.2488° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418714m | Angle error: -20.5444° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418536m | Angle error: -20.8191° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417852m | Angle error: -21.0841° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417969m | Angle error: -21.161° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418236m | Angle error: -20.9129° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418382m | Angle error: -20.9438° | Front clearance: 0.132m
+[Loop 460] Processing scans...[Control] Distance to wall: 0.417929m | Angle error: -21.1259° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417929m | Angle error: -21.1259° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418013m | Angle error: -20.9349° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418013m | Angle error: -20.9349° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418013m | Angle error: -20.9349° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418013m | Angle error: -20.9349° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41785m | Angle error: -21.1327° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418152m | Angle error: -20.9053° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417691m | Angle error: -21.1023° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417691m | Angle error: -21.1023° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418217m | Angle error: -20.8445° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418217m | Angle error: -20.8445° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418217m | Angle error: -20.8445° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418291m | Angle error: -20.8288° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418184m | Angle error: -20.5778° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418291m | Angle error: -20.8288° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41845m | Angle error: -20.8393° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418052m | Angle error: -21.1194° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418052m | Angle error: -21.1194° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41762m | Angle error: -21.1166° | Front clearance: 0.132m
+[Loop 480] Processing scans...[Control] Distance to wall: 0.417945m | Angle error: -20.8947° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418267m | Angle error: -20.8231° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418564m | Angle error: -20.9282° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418091m | Angle error: -21.0623° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418694m | Angle error: -20.8605° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418944m | Angle error: -20.8299° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418126m | Angle error: -21.1124° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417983m | Angle error: -20.8538° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418389m | Angle error: -20.9682° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417983m | Angle error: -20.8538° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418365m | Angle error: -20.8199° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418133m | Angle error: -21.1857° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418661m | Angle error: -20.8548° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418661m | Angle error: -20.8548° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418661m | Angle error: -20.8548° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418103m | Angle error: -21.0981° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418602m | Angle error: -20.8472° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418602m | Angle error: -20.8472° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418723m | Angle error: -20.8132° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418983m | Angle error: -20.7822° | Front clearance: 0.132m
+[Loop 500] Processing scans...[Control] Distance to wall: 0.418723m | Angle error: -20.8132° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418526m | Angle error: -20.8296° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418526m | Angle error: -20.8296° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418608m | Angle error: -20.8005° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418365m | Angle error: -20.8317° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41788m | Angle error: -21.0883° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418283m | Angle error: -20.8493° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418283m | Angle error: -20.8493° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417929m | Angle error: -21.2005° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418294m | Angle error: -20.9201° | Front clearance: 0.133m
+[Control] Distance to wall: 0.418294m | Angle error: -20.9201° | Front clearance: 0.133m
+[Control] Distance to wall: 0.418294m | Angle error: -20.9201° | Front clearance: 0.133m
+[Control] Distance to wall: 0.418485m | Angle error: -20.8474° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418485m | Angle error: -20.8474° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418485m | Angle error: -20.8474° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418513m | Angle error: -20.8531° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418033m | Angle error: -21.1133° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418269m | Angle error: -20.9335° | Front clearance: 0.133m
+[Control] Distance to wall: 0.41797m | Angle error: -20.8682° | Front clearance: 0.133m
+[Control] Distance to wall: 0.417785m | Angle error: -21.1642° | Front clearance: 0.133m
+[Loop 520] Processing scans...[Control] Distance to wall: 0.417811m | Angle error: -21.1449° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417856m | Angle error: -20.963° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418364m | Angle error: -20.9055° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418643m | Angle error: -20.941° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418345m | Angle error: -20.8762° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418345m | Angle error: -20.8762° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418444m | Angle error: -20.9211° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418444m | Angle error: -20.9211° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418091m | Angle error: -20.942° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418091m | Angle error: -20.942° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418176m | Angle error: -20.9848° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418038m | Angle error: -20.8344° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417753m | Angle error: -21.0927° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417753m | Angle error: -21.0927° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417635m | Angle error: -21.2457° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417635m | Angle error: -21.2457° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417635m | Angle error: -21.2457° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41824m | Angle error: -20.8584° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41824m | Angle error: -20.8584° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418342m | Angle error: -20.8778° | Front clearance: 0.132m
+[Loop 540] Processing scans...[Control] Distance to wall: 0.418241m | Angle error: -20.8518° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417744m | Angle error: -21.1002° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418669m | Angle error: -20.7965° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418067m | Angle error: -20.8682° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417954m | Angle error: -21.1036° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418684m | Angle error: -21.095° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418684m | Angle error: -21.095° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418262m | Angle error: -20.9068° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418469m | Angle error: -20.833° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418469m | Angle error: -20.833° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418501m | Angle error: -20.9116° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418832m | Angle error: -21.2203° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418501m | Angle error: -20.9116° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417844m | Angle error: -21.1296° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418388m | Angle error: -20.954° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417997m | Angle error: -20.8428° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418026m | Angle error: -20.8905° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41768m | Angle error: -21.1141° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418026m | Angle error: -20.8905° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418344m | Angle error: -20.8423° | Front clearance: 0.132m
+[Loop 560] Processing scans...[Control] Distance to wall: 0.418587m | Angle error: -20.812° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418727m | Angle error: -20.806° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418195m | Angle error: -20.9069° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418195m | Angle error: -20.9069° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418501m | Angle error: -20.8473° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418501m | Angle error: -20.8473° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418501m | Angle error: -20.8473° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417919m | Angle error: -20.8909° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417919m | Angle error: -20.8909° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417722m | Angle error: -21.1322° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418286m | Angle error: -20.8577° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418375m | Angle error: -20.5849° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418203m | Angle error: -20.9154° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418203m | Angle error: -20.9154° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418203m | Angle error: -20.9154° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417914m | Angle error: -21.1134° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417914m | Angle error: -21.1134° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417914m | Angle error: -21.1134° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418409m | Angle error: -20.8673° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417821m | Angle error: -21.1127° | Front clearance: 0.132m
+[Loop 580] Processing scans...[Control] Distance to wall: 0.417821m | Angle error: -21.1127° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41796m | Angle error: -21.1099° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418332m | Angle error: -20.6374° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418386m | Angle error: -20.577° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418497m | Angle error: -20.8883° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418094m | Angle error: -21.1019° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417832m | Angle error: -21.115° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418073m | Angle error: -20.604° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417832m | Angle error: -21.115° | Front clearance: 0.132m
+[Control] Distance to wall: 0.4189m | Angle error: -20.9134° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418367m | Angle error: -21.1588° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418367m | Angle error: -21.1588° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41851m | Angle error: -20.9276° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41851m | Angle error: -20.9276° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41851m | Angle error: -20.9276° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418322m | Angle error: -20.9154° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418322m | Angle error: -20.9154° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418322m | Angle error: -20.9154° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418441m | Angle error: -20.9294° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41813m | Angle error: -20.8628° | Front clearance: 0.132m
+[Loop 600] Processing scans...[Control] Distance to wall: 0.417887m | Angle error: -21.1737° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417887m | Angle error: -21.1737° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417887m | Angle error: -21.1737° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418726m | Angle error: -20.532° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418516m | Angle error: -20.5577° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418726m | Angle error: -20.532° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418058m | Angle error: -20.885° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418058m | Angle error: -20.885° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417659m | Angle error: -21.0992° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41818m | Angle error: -20.8849° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41868m | Angle error: -21.0705° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418715m | Angle error: -21.0253° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418335m | Angle error: -20.9172° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418715m | Angle error: -21.0253° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417924m | Angle error: -21.1391° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418387m | Angle error: -20.9179° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417858m | Angle error: -21.1495° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417749m | Angle error: -21.0711° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418298m | Angle error: -20.825° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418212m | Angle error: -20.5792° | Front clearance: 0.132m
+[Loop 620] Processing scans...[Control] Distance to wall: 0.418532m | Angle error: -20.8324° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418532m | Angle error: -20.8324° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418784m | Angle error: -20.8027° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417922m | Angle error: -20.8856° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418228m | Angle error: -20.9522° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417854m | Angle error: -21.1754° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41836m | Angle error: -20.918° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418594m | Angle error: -20.9884° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418337m | Angle error: -20.8275° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418337m | Angle error: -20.8275° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418337m | Angle error: -20.8275° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418085m | Angle error: -20.922° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418085m | Angle error: -20.922° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417964m | Angle error: -21.1729° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417636m | Angle error: -20.8856° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417636m | Angle error: -20.8856° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417636m | Angle error: -20.8856° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418098m | Angle error: -20.9229° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418084m | Angle error: -21.2398° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418452m | Angle error: -20.852° | Front clearance: 0.132m
+[Loop 640] Processing scans...[Control] Distance to wall: 0.4187m | Angle error: -20.8216° | Front clearance: 0.132m
+[Control] Distance to wall: 0.4187m | Angle error: -20.8216° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418636m | Angle error: -20.8505° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418636m | Angle error: -20.8505° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418636m | Angle error: -20.8505° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417698m | Angle error: -21.1078° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41828m | Angle error: -20.8708° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417698m | Angle error: -21.1078° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418463m | Angle error: -21.0115° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418079m | Angle error: -20.9054° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41787m | Angle error: -21.1505° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417819m | Angle error: -20.9326° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417819m | Angle error: -20.9326° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417815m | Angle error: -21.0479° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418288m | Angle error: -20.8498° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418288m | Angle error: -20.8498° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418529m | Angle error: -20.8195° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417861m | Angle error: -20.9291° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417987m | Angle error: -20.9548° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417574m | Angle error: -21.1563° | Front clearance: 0.132m
+[Loop 660] Processing scans...[Control] Distance to wall: 0.417764m | Angle error: -20.9044° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418169m | Angle error: -21.0302° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41764m | Angle error: -21.1878° | Front clearance: 0.132m
+[Control] Distance to wall: 0.4182m | Angle error: -21.181° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418448m | Angle error: -20.817° | Front clearance: 0.132m
+[Control] Distance to wall: 0.4182m | Angle error: -21.181° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418129m | Angle error: -20.9417° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418129m | Angle error: -20.9417° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417637m | Angle error: -20.932° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417406m | Angle error: -21.1593° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417406m | Angle error: -21.1593° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418259m | Angle error: -20.8947° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418478m | Angle error: -20.87° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418259m | Angle error: -20.8947° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418891m | Angle error: -21.0642° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418451m | Angle error: -21.1626° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418891m | Angle error: -21.0642° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417919m | Angle error: -21.1285° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418399m | Angle error: -20.6477° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417838m | Angle error: -21.1111° | Front clearance: 0.132m
+[Loop 680] Processing scans...[Control] Distance to wall: 0.418024m | Angle error: -20.9149° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418024m | Angle error: -20.9149° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418024m | Angle error: -20.9149° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418574m | Angle error: -20.8411° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418046m | Angle error: -21.0913° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417703m | Angle error: -20.9235° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417703m | Angle error: -20.9235° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417359m | Angle error: -21.1427° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418647m | Angle error: -20.8134° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418405m | Angle error: -20.8438° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418405m | Angle error: -20.8438° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418378m | Angle error: -20.8478° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418378m | Angle error: -20.8478° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418378m | Angle error: -20.8478° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41833m | Angle error: -20.9125° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418861m | Angle error: -20.8149° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41833m | Angle error: -20.9125° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417978m | Angle error: -20.9439° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417804m | Angle error: -21.191° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418334m | Angle error: -20.8934° | Front clearance: 0.132m
+[Loop 700] Processing scans...[Control] Distance to wall: 0.418334m | Angle error: -20.8934° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418334m | Angle error: -20.8934° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418347m | Angle error: -20.5681° | Front clearance: 0.132m
+[Control] Distance to wall: 0.41815m | Angle error: -21.1132° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418604m | Angle error: -20.6339° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418147m | Angle error: -20.8455° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418147m | Angle error: -20.8455° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417983m | Angle error: -20.5911° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418207m | Angle error: -20.9123° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418424m | Angle error: -20.8871° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417858m | Angle error: -21.1324° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417819m | Angle error: -21.2401° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417924m | Angle error: -20.9456° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417984m | Angle error: -21.2307° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417984m | Angle error: -21.2307° | Front clearance: 0.132m
+[Control] Distance to wall: 0.417984m | Angle error: -21.2307° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418234m | Angle error: -21.1002° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418463m | Angle error: -20.5686° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418234m | Angle error: -21.1002° | Front clearance: 0.132m
+[Control] Distance to wall: 0.418847m | Angle error: -20.8561° | Front clearance: 0.132m
+[Loop 720] Processing scans...
