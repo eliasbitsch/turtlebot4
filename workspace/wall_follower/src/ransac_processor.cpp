@@ -23,7 +23,7 @@ int random_int(int min, int max) {
 
 double distance_squared(const Point& p, const Line& line) {
     double numerator = line.m * p.x - p.y + line.c;
-    return (numerator * numerator) / (line.m * line.m + 1.0);
+    return (numerator * numerator) / (line.m * line.m + 1.0); //distance = |mx₀ - y₀ + c| / √(m² + 1)
 }
 
 // --- Data Conversion Function ---
@@ -138,10 +138,34 @@ void process_scan_with_ransac(const ParsedScan& raw_scan_data, WallFollower* fol
         return;
     }
 
+    // Debug: Show raw scan info
+    static int debug_counter = 0;
+    if (++debug_counter % 20 == 0) {
+        std::cout << "\n[DEBUG] Raw scan: valid=" << raw_scan_data.valid 
+                  << " num_ranges=" << raw_scan_data.num_ranges
+                  << " angle_min=" << raw_scan_data.angle_min
+                  << " angle_max=" << (raw_scan_data.angle_min + raw_scan_data.num_ranges * raw_scan_data.angle_increment)
+                  << "\n";
+        
+        // Show some sample ranges
+        if (raw_scan_data.num_ranges > 0) {
+            std::cout << "[DEBUG] Sample ranges: ";
+            for (size_t i = 0; i < std::min(size_t(5), raw_scan_data.num_ranges); i++) {
+                std::cout << raw_scan_data.ranges[i] << " ";
+            }
+            std::cout << "... ";
+            for (size_t i = raw_scan_data.num_ranges - 5; i < raw_scan_data.num_ranges; i++) {
+                std::cout << raw_scan_data.ranges[i] << " ";
+            }
+            std::cout << "\n";
+        }
+    }
+
     // 1. Convert raw polar data to Cartesian points
     std::vector<Point> scan_data = convert_scan_to_points(raw_scan_data);
 
     if (scan_data.empty()) {
+        std::cout << "[RANSAC] No valid scan points!\n";
         follower->emergencyStop(); // Safety if no data is available
         return;
     }
@@ -150,9 +174,19 @@ void process_scan_with_ransac(const ParsedScan& raw_scan_data, WallFollower* fol
     size_t inlier_count = 0;
     Line best_line = ransac_fit_line(scan_data, MAX_RANSAC_ITERATIONS, DISTANCE_THRESHOLD, inlier_count);
 
+    // Debug: Show RANSAC results periodically
+    if (debug_counter % 20 == 0) {
+        std::cout << "[RANSAC] Points: " << scan_data.size() 
+                  << " | Inliers: " << inlier_count 
+                  << " (" << (scan_data.size() > 0 ? (100.0 * inlier_count / scan_data.size()) : 0) << "%)";
+        std::cout << " | Line: y = " << best_line.m << "x + " << best_line.c << "\n";
+    }
+
     // If RANSAC didn't find a strong consensus, we might want to stop or just spin.
     if (inlier_count < scan_data.size() * 0.2) { // Example threshold: require > 20% consensus
-         // std::cout << "[RANSAC] Low consensus. Stopping.\n";
+         if (debug_counter % 20 == 0) {
+             std::cout << "[RANSAC] Low consensus - wall detection uncertain\n";
+         }
          // follower->emergencyStop();
          // return;
     }
@@ -203,6 +237,15 @@ void process_scan_with_ransac(const ParsedScan& raw_scan_data, WallFollower* fol
         angle_error_rad,
         front_clearance
     };
+    
+    // Determine wall direction
+    const char* wall_direction = (perpendicular_distance > 0) ? "Left" : "Right";
+    
+    // Debug output: Show control inputs
+    std::cout << "[Control] Wall Direction: " << wall_direction
+              << " | Distance: " << perpendicular_distance << "m"
+              << " | Angle error: " << (angle_error_rad * 180.0 / M_PI) << "°"
+              << " | Front clearance: " << front_clearance << "m\n";
     
     follower->computeAndCommand(control_result);
 }

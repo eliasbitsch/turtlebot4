@@ -68,6 +68,7 @@ void WallFollower::computeAndCommand(const RansacResult& result) {
         cmd.linear_x = linear_x;
         cmd.angular_z = angular_z;
         cmd.new_command = true;
+        cmd.sequence++;  // Increment sequence so bridge detects new command
 
         // Update timestamp
         auto now = std::chrono::system_clock::now();
