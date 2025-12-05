@@ -8,7 +8,7 @@ typedef short          s16;
 typedef int            s32;
 typedef unsigned long  u64;
 
-// --- Joystick Event ---
+// Joystick Event
 struct js_event {
     u32 time;
     s16 value;
@@ -18,7 +18,7 @@ struct js_event {
 
 int is_axis(u8 t) { return t & 2; }
 
-// --- SharedCmdVel Struct (matches turtlebot4::SharedCmdVel) ---
+// SharedCmdVel Struct (matches turtlebot4::SharedCmdVel)
 struct SharedCmdVel {
     double linear_x;
     double linear_y;
@@ -33,13 +33,13 @@ struct SharedCmdVel {
     bool new_command;
 };
 
-// --- SharedBlock with SeqLock (matches turtlebot4::SharedMemory<T>::SharedBlock) ---
+// SharedBlock with SeqLock (matches turtlebot4::SharedMemory<T>::SharedBlock)
 struct SharedBlock {
     volatile u64 seqlock;  // SeqLock sequence counter (atomic)
     SharedCmdVel data;
 };
 
-// --- External syscalls ---
+// External syscalls
 extern "C" int open(const char* path, int flags);
 extern "C" int read(int fd, void* buf, unsigned int count);
 extern "C" int printf(const char*, ...);
@@ -49,7 +49,7 @@ extern "C" int ftruncate(int fd, long length);
 extern "C" void* mmap(void* addr, unsigned long length, int prot, int flags, int fd, long offset);
 extern "C" int clock_gettime(int clk_id, void* ts);
 
-// --- Constants ---
+// Constants
 #define O_RDWR     2
 #define O_CREAT    64
 #define PROT_READ  1
@@ -61,7 +61,7 @@ extern "C" int clock_gettime(int clk_id, void* ts);
 inline void memory_fence() { __sync_synchronize(); }
 
 int main() {
-    // --- 1. Open Joystick ---
+    // 1. Open Joystick
     int fd = open("/dev/input/js0", 0);
     if (fd < 0) {
         fd = open("/dev/input/js1", 0);
@@ -81,7 +81,7 @@ int main() {
     const float norm  = 32767.0f;
     const int deadzone = 3000;
 
-    // --- 2. Open Shared Memory (don't create, bridge creates it) ---
+    // 2. Open Shared Memory (don't create, bridge creates it)
     int shm_fd = shm_open("/shm_cmd_vel", O_RDWR, 0666);
     if (shm_fd < 0) {
         printf("Error: Cannot open /shm_cmd_vel - is the bridge running?\n");
@@ -117,7 +117,7 @@ int main() {
         float v = -(raw_v / norm) * max_v;  // invert: stick up = forward
         float w = -(raw_w / norm) * max_w;  // invert: stick left = turn left
 
-        // --- 3. Write with SeqLock protocol ---
+        // 3. Write with SeqLock protocol
         // Increment sequence (odd = write in progress)
         block->seqlock++;
         memory_fence();

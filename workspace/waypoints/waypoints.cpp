@@ -39,13 +39,12 @@ void markPosition(std::vector<std::vector<char>> &grid, double x, double y) {
 }
 
 
-/* ------------------ Beispiel Main ------------------ */
+// Beispiel Main
 int main() {
     // Grid erstellen
     std::vector<std::vector<char>> grid = createGrid();
 
-    // ---------------- Beispiel-Zielpunkt ----------------
-    // Zum Testen kann der Roboter hier einen Punkt markieren
+    // Beispiel-Zielpunkt
     double example_target_x = 15.0;
     double example_target_y = 7.0;
 
