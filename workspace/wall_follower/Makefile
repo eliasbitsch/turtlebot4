@@ -13,13 +13,17 @@ TARGET = $(BUILD)/wall_follower
 SRCS = src/main.cpp src/wall_follower.cpp src/ransac_processor.cpp
 OBJS = $(OBJ)/main.o $(OBJ)/wall_follower.o $(OBJ)/ransac_processor.o
 
-.PHONY: all clean help
+.PHONY: all clean help test_visual
 
 all: $(TARGET)
 	@echo "Built: $(TARGET)"
 
 $(TARGET): $(OBJS) | $(BUILD)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $@ $(LDFLAGS)
+
+test_visual: test_ransac_visual.cpp | $(BUILD)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $< -o $(BUILD)/test_visual $(LDFLAGS)
+	@echo "Built: $(BUILD)/test_visual"
 
 $(OBJ)/%.o: src/%.cpp | $(OBJ)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@

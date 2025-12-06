@@ -11,8 +11,9 @@ namespace turtlebot4 {
 
 // Wall follower behavior states
 enum class FollowerState {
-    SEARCH,    // Rotating to find a wall
-    APPROACH,  // Driving toward detected wall
+    SEARCH,    // Rotating to find the closest wall
+    APPROACH,  // Driving toward the detected wall
+    ALIGN,     // Turning to become parallel with the wall
     FOLLOW     // Following along the wall
 };
 
@@ -24,6 +25,11 @@ struct RansacResult {
     double perpendicular_distance; // Perpendicular distance from robot origin (0,0) to the fitted line (meters)
     double angle_error_rad;        // Angle of the fitted line relative to the robot's forward axis (radians)
     double front_clearance;        // Minimum distance in a forward-facing arc, for safety/avoidance (meters)
+    double left_clearance;         // Minimum distance to the left side (meters)
+    double right_clearance;        // Minimum distance to the right side (meters)
+    bool has_front_wall;           // True if there's a wall in front (front_clearance < threshold)
+    bool has_left_wall;            // True if there's a wall on the left
+    bool has_right_wall;           // True if there's a wall on the right
 };
 
 /**
@@ -35,8 +41,7 @@ public:
     // PID Gains and desired distance (can be configured externally)
     WallFollower(SharedMemory<SharedCmdVel>& cmd_shm, 
                  double kp_dist = 3.0, double ki_dist = 0.1, double kd_dist = 0.5,
-                 double kp_angle = 5.0, double ki_angle = 0.05, double kd_angle = 0.8,
-                 double desired_dist = 0.5);
+                 double kp_angle = 5.0, double ki_angle = 0.05, double kd_angle = 0.8);
 
     /**
      * @brief Computes control commands based on the RANSAC results and writes to Shared Memory.
@@ -77,12 +82,18 @@ private:
     // State machine
     FollowerState state_;
     double state_timer_;
+    double target_wall_distance_;  // Distance to wall when first detected
+    int target_wall_side_;         // +1 for left, -1 for right
+    double closest_wall_distance_; // Closest wall found during search
+    int closest_wall_side_;        // Side of closest wall
 
     // Limit Constants (Adjust these based on TurtleBot4 specs)
-    static constexpr double MAX_ANGULAR = 2.84;
-    static constexpr double MAX_LINEAR = 0.22;
-    static constexpr double EMERGENCY_STOP_DIST = 0.3; // 30 cm stop distance
-    static constexpr double SAFE_LINEAR_VEL = 0.15;
+    static constexpr double MAX_ANGULAR = 0.84;        // Reduce 2.84 -> 1.84
+    static constexpr double MAX_LINEAR = 0.80;
+    static constexpr double EMERGENCY_STOP_DIST = 0.6; // 60 cm stop distance
+    static constexpr double SAFE_LINEAR_VEL = 0.50;    // Increase speed: 0.15 → 0.20 m/s
+    static constexpr double TURN_DISTANCE = 1;       // Distance at which to trigger turn when front wall is closest
+    static constexpr double DESIRED_WALL_DISTANCE = 1; // Target distance to maintain from wall while following (meters)
 };
 
 } // namespace turtlebot4

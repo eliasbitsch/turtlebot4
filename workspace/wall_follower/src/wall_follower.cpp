@@ -8,8 +8,7 @@ namespace turtlebot4 {
 
 WallFollower::WallFollower(SharedMemory<SharedCmdVel>& cmd_shm, 
                            double kp_dist, double ki_dist, double kd_dist,
-                           double kp_angle, double ki_angle, double kd_angle,
-                           double desired_dist)
+                           double kp_angle, double ki_angle, double kd_angle)
     : cmd_shm_(cmd_shm),
       KP_DISTANCE_(kp_dist),
       KI_DISTANCE_(ki_dist),
@@ -17,7 +16,7 @@ WallFollower::WallFollower(SharedMemory<SharedCmdVel>& cmd_shm,
       KP_ANGLE_(kp_angle),
       KI_ANGLE_(ki_angle),
       KD_ANGLE_(kd_angle),
-      DESIRED_DISTANCE_(desired_dist),
+      DESIRED_DISTANCE_(DESIRED_WALL_DISTANCE),
       cmd_sequence_(0),
       integral_distance_(0.0),
       integral_angle_(0.0),
@@ -25,10 +24,12 @@ WallFollower::WallFollower(SharedMemory<SharedCmdVel>& cmd_shm,
       prev_angle_error_(0.0),
       prev_time_(0.0),
       state_(FollowerState::SEARCH),
-      state_timer_(0.0)
+      state_timer_(0.0),
+      target_wall_distance_(0.0),
+      target_wall_side_(0),
+      closest_wall_distance_(999.0),
+      closest_wall_side_(0)
 {
-    std::cout << "[WallFollower] Initialized PID controller. Target distance: " << DESIRED_DISTANCE_ << "m.\n";
-    std::cout << "[WallFollower] Starting in SEARCH mode...\n";
 }
 
 void WallFollower::emergencyStop() {
@@ -50,18 +51,25 @@ void WallFollower::emergencyStop() {
 
 void WallFollower::computeAndCommand(const RansacResult& result) {
     // --- 1. Check for Front Obstacle (Safety Override) ---
+    // Commented out during calibration - will re-enable when move commands are active
+    /*
     if (result.front_clearance < EMERGENCY_STOP_DIST) {
-        std::cout << "[WallFollower] Emergency stop: front clearance " << result.front_clearance << "m\n";
-        emergencyStop();
-        return;
+        std::cout << "[OBSTACLE] Front clearance " << result.front_clearance 
+                  << "m - Returning to SEARCH\n";
+        state_ = FollowerState::SEARCH;
+        state_timer_ = 0.0;
+        // Don't return - let it continue to SEARCH state below
     }
+    */
 
     // --- 2. Calculate Time Delta ---
     auto now = std::chrono::high_resolution_clock::now();
     double current_time = std::chrono::duration<double>(now.time_since_epoch()).count();
     double dt = (prev_time_ > 0.0) ? (current_time - prev_time_) : 0.05; // default 50ms
     prev_time_ = current_time;
-    dt = std::clamp(dt, 0.01, 0.2); // Clamp to avoid instability
+    dt = std::clamp(dt, 0.01, 0.2); // dt too small (near 0): derivative = (Δerror)/dt becomes huge → spikes/noise amplified → unstable angular/linear outputs.
+                                    // dt too small can be caused by clock resolution, repeated near-zero reads, or measurement jitter.
+                                    // dt too large: integral accumulates a big chunk at once → big overshoot (integrator windup) and slow/unstable response.
 
     state_timer_ += dt;
 
@@ -74,84 +82,105 @@ void WallFollower::computeAndCommand(const RansacResult& result) {
     // --- STATE MACHINE ---
     switch (state_) {
         case FollowerState::SEARCH: {
-            // Rotate in place to find a wall (look for distance < 2m)
-            angular_z = 0.5; // Rotate slowly
+            // Stay still and scan - just output distances for calibration
+            angular_z = 0.0;
             linear_x = 0.0;
 
-            if (abs_distance > 0.1 && abs_distance < 2.0) {
-                std::cout << "[WallFollower] Wall detected at " << abs_distance << "m! Switching to APPROACH.\n";
-                state_ = FollowerState::APPROACH;
-                state_timer_ = 0.0;
-            }
+            // Simple distance output for calibration
+            std::cout << "[DISTANCES] Front: " << result.front_clearance << "m"
+                     << " | Left: " << result.left_clearance << "m"
+                     << " | Right: " << result.right_clearance << "m\n";
+
+            // Stay in SEARCH state - no state transitions during calibration
             break;
         }
 
         case FollowerState::APPROACH: {
-            // Drive toward wall until we're at desired distance
-            double approach_error = abs_distance - DESIRED_DISTANCE_;
+            // Drive toward the wall until we reach desired distance
+            double distance_to_target = abs_distance - DESIRED_DISTANCE_;
             
-            if (approach_error < 0.1) {
-                std::cout << "[WallFollower] Reached wall! Switching to FOLLOW mode.\n";
+            if (distance_to_target < 0.15) {
+                // Reached target distance - now align parallel
+                state_ = FollowerState::ALIGN;
+                state_timer_ = 0.0;
+                std::cout << "[STATE] Reached wall at " << abs_distance << "m - Aligning...\n";
+            } else {
+                // Drive toward wall, adjust heading slightly
+                linear_x = std::clamp(distance_to_target * 0.4, 0.1, 0.2);
+                // Gentle steering to keep wall on correct side
+                angular_z = -result.angle_error_rad * 1.5;
+                angular_z = std::clamp(angular_z, -0.8, 0.8);
+            }
+            break;
+        }
+
+        case FollowerState::ALIGN: {
+            // Turn to become parallel with the wall
+            double angle_deg = std::abs(result.angle_error_rad * 180.0 / M_PI);
+            
+            // Print alignment status
+            std::cout << "[STATE] Aligning - angle=" << angle_deg << "° (target <20°)\n";
+            
+            if (angle_deg < 20.0) {
+                // Wall is close enough to parallel - start following
                 state_ = FollowerState::FOLLOW;
                 state_timer_ = 0.0;
                 integral_distance_ = 0.0;
                 integral_angle_ = 0.0;
+                std::cout << "[STATE] Aligned (angle=" << angle_deg << "°) - Following...\n";
             } else {
-                // Drive forward, slightly turn to align
-                linear_x = std::min(0.2, approach_error * 0.5);
-                angular_z = -result.angle_error_rad * 2.0; // Align while approaching
+                // Move slowly forward while rotating to change perspective
+                linear_x = 0.08;
+                // Rotate to align
+                angular_z = -result.angle_error_rad * 1.5;
                 angular_z = std::clamp(angular_z, -1.0, 1.0);
             }
             break;
         }
 
         case FollowerState::FOLLOW: {
-            // --- Full PID Wall Following ---
+            // --- Proportional Wall Following (like linear_controller) ---
             const double distance_error = DESIRED_DISTANCE_ - abs_distance;
             const double angle_error = result.angle_error_rad;
+            
+            // Print status continuously
+            double angle_deg = std::abs(angle_error * 180.0 / M_PI);
+            std::cout << "[STATE] Following - Wall at " << abs_distance << "m on " 
+                     << (target_wall_side_ > 0 ? "LEFT" : "RIGHT") 
+                     << " (angle=" << angle_deg << "°)\n";
 
-            // PID for distance
-            integral_distance_ += distance_error * dt;
-            integral_distance_ = std::clamp(integral_distance_, -1.0, 1.0);
-            double derivative_distance = (distance_error - prev_distance_error_) / dt;
-            prev_distance_error_ = distance_error;
-
-            double ang_from_distance = KP_DISTANCE_ * distance_error +
-                                       KI_DISTANCE_ * integral_distance_ +
-                                       KD_DISTANCE_ * derivative_distance;
+            // Simple proportional control for distance correction
+            double ang_from_distance = KP_DISTANCE_ * distance_error;
+            // Apply correction based on which side wall is on
             ang_from_distance *= (signed_distance >= 0.0 ? 1.0 : -1.0);
 
-            // PID for angle
-            integral_angle_ += angle_error * dt;
-            integral_angle_ = std::clamp(integral_angle_, -1.0, 1.0);
-            double derivative_angle = (angle_error - prev_angle_error_) / dt;
-            prev_angle_error_ = angle_error;
+            // Proportional control for angle (keep parallel)
+            double ang_from_angle = KP_ANGLE_ * angle_error;
 
-            double ang_from_angle = KP_ANGLE_ * angle_error +
-                                   KI_ANGLE_ * integral_angle_ +
-                                   KD_ANGLE_ * derivative_angle;
-
+            // Combine angle corrections
             angular_z = ang_from_angle + ang_from_distance;
             angular_z = std::clamp(angular_z, -MAX_ANGULAR, MAX_ANGULAR);
 
-            // Linear velocity (slow down when turning)
+            // Drive forward at steady speed, slow down when turning sharply
             linear_x = SAFE_LINEAR_VEL;
-            double clearance_scale = std::clamp((result.front_clearance - EMERGENCY_STOP_DIST) / (DESIRED_DISTANCE_ + 0.3), 0.0, 1.0);
-            double turning_scale = std::clamp(1.0 - (std::abs(angular_z) / MAX_ANGULAR), 0.2, 1.0);
+            double clearance_scale = std::clamp((result.front_clearance - EMERGENCY_STOP_DIST) / 0.8, 0.0, 1.0);
+            double turning_scale = std::clamp(1.0 - (std::abs(angular_z) / MAX_ANGULAR) * 0.5, 0.3, 1.0);
             linear_x *= clearance_scale * turning_scale;
-            linear_x = std::clamp(linear_x, -MAX_LINEAR, MAX_LINEAR);
+            linear_x = std::clamp(linear_x, 0.0, MAX_LINEAR);
 
             // If we lose the wall, go back to search
-            if (abs_distance > 3.0 || abs_distance < 0.05) {
-                std::cout << "[WallFollower] Lost wall! Returning to SEARCH mode.\n";
+            if (abs_distance > 2.5 || abs_distance < 0.2) {
                 state_ = FollowerState::SEARCH;
                 state_timer_ = 0.0;
+                std::cout << "[STATE] Lost wall (dist=" << abs_distance << "m) - Searching...\n";
             }
             break;
         }
     }
 
     // --- Write Command to Shared Memory ---
+    // DISABLED FOR LASER CALIBRATION - Just observing wall detection, not moving robot
+    /*
     cmd_shm_.update([&](SharedCmdVel& cmd) {
         cmd.linear_x = linear_x;
         cmd.linear_y = 0.0;
@@ -166,6 +195,7 @@ void WallFollower::computeAndCommand(const RansacResult& result) {
         cmd.timestamp_sec = std::chrono::duration_cast<std::chrono::seconds>(now).count();
         cmd.timestamp_nanosec = std::chrono::duration_cast<std::chrono::nanoseconds>(now).count() % 1000000000;
     });
+    */
 }
 
 } // namespace turtlebot4

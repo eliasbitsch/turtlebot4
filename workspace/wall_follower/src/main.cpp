@@ -45,9 +45,16 @@ int main() {
         std::cout << "  - " << shm_names::CMD_VEL << std::endl;
         std::cout << std::endl;
 
-        // Create wall follower controller with PID gains
-        // WallFollower(cmd_shm, kp_dist, ki_dist, kd_dist, kp_angle, ki_angle, kd_angle, desired_dist)
-        WallFollower wall_follower(cmd_shm, 3.0, 0.1, 0.5, 5.0, 0.05, 0.8, 0.5);
+        // Create wall follower controller with proportional gains
+        // Using simple proportional control like linear_controller for stability
+        WallFollower wall_follower(cmd_shm, 
+            2.0,   // kp_dist: proportional gain for distance error
+            0.0,   // ki_dist: no integral (set to 0)
+            0.0,   // kd_dist: no derivative (set to 0)
+            3.0,   // kp_angle: proportional gain for angle error  
+            0.0,   // ki_angle: no integral (set to 0)
+            0.0);  // kd_angle: no derivative (set to 0)
+        // Wall following distance is set by DESIRED_WALL_DISTANCE constant in wall_follower.hpp
         
         std::cout << "[WallFollower] Running... Press Ctrl+C to stop" << std::endl;
         std::cout << std::endl;
@@ -60,29 +67,16 @@ int main() {
             // Read latest scan data from shared memory
             SharedScan scan = scan_shm.read_copy();
             
-            // Debug: print every read
-            static int read_count = 0;
-            if (++read_count % 10 == 0) {
-                std::cout << "\n[MAIN DEBUG] Read #" << read_count 
-                          << " seq=" << scan.sequence 
-                          << " last_seq=" << last_seq
-                          << " num_ranges=" << scan.num_ranges
-                          << " first_range=" << (scan.num_ranges > 0 ? scan.ranges[0] : -1.0f)
-                          << "\n";
-            }
-
             // Skip if no new data
             if (scan.sequence == last_seq || scan.num_ranges == 0 || scan.angle_increment <= 0.0f) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(20));
                 continue;
             }
-            last_seq = scan.sequence;            // Process scan with RANSAC and control
-            process_scan_with_ransac(scan, &wall_follower);
+            last_seq = scan.sequence;
             
-            // Print status every 20 iterations (~1 second at 20Hz)
-            if (++loop_count % 20 == 0) {
-                std::cout << "\r[Loop " << loop_count << "] Processing scans..." << std::flush;
-            }
+            // Process scan with RANSAC and control
+            process_scan_with_ransac(scan, &wall_follower);
+            loop_count++;
 
             // Sleep to match typical scan rate (~20-50 Hz)
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
