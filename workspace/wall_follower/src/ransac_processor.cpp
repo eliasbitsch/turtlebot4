@@ -51,9 +51,9 @@ std::vector<Point> convert_scan_to_points(const SharedScan& scan) {
         
         double angle = scan.angle_min + i * scan.angle_increment;
         
-        // ROTATE LASER FRAME: Rotate readings 90° clockwise (-π/2) to align with robot front
-        // What the laser sees at +90° (left) is actually the robot's front (0°)
-        angle = angle - M_PI / 2.0;
+        // ROTATE LASER FRAME: Previously rotated -90°. Add 180° flip so effective
+        // rotation becomes +90° (adjusts mapping when front/back were inverted).
+        angle = angle + M_PI / 2.0;
         
         // Optional: Skip back angles where cables are (adjust range as needed)
         // Uncomment to exclude rear 90 degrees (±45° from back)
@@ -154,7 +154,7 @@ Line ransac_fit_line(const std::vector<Point>& data, int max_iterations, double 
 
 void process_scan_with_ransac(const SharedScan& raw_scan_data, WallFollower* follower) {
     if (!follower) {
-        std::cerr << "[RANSAC] WallFollower instance is null. Cannot command robot.\n";
+        // std::cerr << "[RANSAC] WallFollower instance is null. Cannot command robot.\n";
         return;
     }
 
@@ -213,7 +213,7 @@ void process_scan_with_ransac(const SharedScan& raw_scan_data, WallFollower* fol
     std::vector<Point> scan_data = convert_scan_to_points(raw_scan_data);
 
     if (scan_data.empty()) {
-        std::cout << "[RANSAC] No valid scan points!\n";
+        // std::cout << "[RANSAC] No valid scan points!\n";
         follower->emergencyStop(); // Safety if no data is available
         return;
     }
@@ -244,14 +244,20 @@ void process_scan_with_ransac(const SharedScan& raw_scan_data, WallFollower* fol
     double left_clearance = raw_scan_data.range_max;
     double right_clearance = raw_scan_data.range_max;
     double front_angle = 0, left_angle = 0, right_angle = 0;
-    const double REGION_ARC_RAD = M_PI / 4.0; // 45 degree regions
+    // Use explicit half-widths: 22.5° (π/8) for front and sides so all regions
+    // have the same angular width as requested by the user.
+    const double FRONT_HALF_RAD = M_PI / 8.0; // 22.5 degrees
+    const double SIDE_HALF_RAD  = M_PI / 8.0; // 22.5 degrees
+    const double LEFT_CENTER =  M_PI / 2.0;   // +90 degrees
+    const double RIGHT_CENTER = -M_PI / 2.0;  // -90 degrees
     int forward_count = 0;
     
     for (size_t i = 0; i < raw_scan_data.num_ranges; ++i) {
         double current_angle = raw_scan_data.angle_min + i * raw_scan_data.angle_increment;
         
-        // ROTATE LASER FRAME: Rotate readings 90° clockwise (-π/2) to align with robot front
-        current_angle = current_angle - M_PI / 2.0;
+        // ROTATE LASER FRAME: Previously rotated -90°. Add 180° flip so effective
+        // rotation becomes +90° (adjusts mapping when front/back were inverted).
+        current_angle = current_angle + M_PI / 2.0;
         
         float range = raw_scan_data.ranges[i];
         
@@ -265,23 +271,23 @@ void process_scan_with_ransac(const SharedScan& raw_scan_data, WallFollower* fol
         while (norm_angle > M_PI) norm_angle -= 2 * M_PI;
         while (norm_angle < -M_PI) norm_angle += 2 * M_PI;
         
-        // Front region: -22.5° to +22.5° (±π/8)
-        if (std::abs(norm_angle) < REGION_ARC_RAD / 2.0) {
+        // Front region: -22.5° to +22.5° (centered at 0)
+        if (std::abs(norm_angle) <= FRONT_HALF_RAD) {
             if (range < front_clearance) {
                 front_clearance = (double)range;
                 front_angle = norm_angle * 180.0 / M_PI;
             }
             forward_count++;
         }
-        // Left region: +22.5° to +112.5° (π/8 to 5π/8)
-        else if (norm_angle > REGION_ARC_RAD / 2.0 && norm_angle < M_PI - REGION_ARC_RAD / 2.0) {
+        // Left region: centered at +90° with ±22.5° half-width (67.5° .. 112.5°)
+        else if (std::abs(norm_angle - LEFT_CENTER) <= SIDE_HALF_RAD) {
             if (range < left_clearance) {
                 left_clearance = (double)range;
                 left_angle = norm_angle * 180.0 / M_PI;
             }
         }
-        // Right region: -22.5° to -112.5° (-π/8 to -5π/8)
-        else if (norm_angle < -REGION_ARC_RAD / 2.0 && norm_angle > -(M_PI - REGION_ARC_RAD / 2.0)) {
+        // Right region: centered at -90° with ±22.5° half-width (-112.5° .. -67.5°)
+        else if (std::abs(norm_angle - RIGHT_CENTER) <= SIDE_HALF_RAD) {
             if (range < right_clearance) {
                 right_clearance = (double)range;
                 right_angle = norm_angle * 180.0 / M_PI;
@@ -290,10 +296,11 @@ void process_scan_with_ransac(const SharedScan& raw_scan_data, WallFollower* fol
     }
     
     // Debug: Print regional clearances with angle information for calibration
-    std::cout << "[CALIBRATION] Regional clearances:\n"
-              << "  Front: " << front_clearance << "m at " << front_angle << "° (range: -22.5° to +22.5°)\n"
-              << "  Left:  " << left_clearance << "m at " << left_angle << "° (range: +22.5° to +112.5°)\n"
-              << "  Right: " << right_clearance << "m at " << right_angle << "° (range: -22.5° to -112.5°)\n";
+    // Suppress calibration prints when not needed
+    // std::cout << "[CALIBRATION] Regional clearances:\n"
+    //           << "  Front: " << front_clearance << "m at " << front_angle << "° (range: -22.5° to +22.5°)\n"
+    //           << "  Left:  " << left_clearance << "m at " << left_angle << "° (range: 67.5° to 112.5°)\n"
+    //           << "  Right: " << right_clearance << "m at " << right_angle << "° (range: -112.5° to -67.5°)\n";
 
     // 4. Command Wall Follower
     const double WALL_DETECT_THRESHOLD = 1.5; // Walls closer than 1.5m are considered present
@@ -330,16 +337,16 @@ void process_scan_with_ransac(const SharedScan& raw_scan_data, WallFollower* fol
         wall_orientation = "ANGLED";
     }
     
-    // Print clear RANSAC wall detection results
-    std::cout << "[RANSAC] " 
-              << " Wall: " << wall_side 
-              << " " << wall_orientation
-              << " | Dist: " << std::abs(perpendicular_distance) << "m"
-              << " Angle: " << angle_deg << "°"
-              << " | Points: " << scan_data.size() 
-              << " Inliers: " << inlier_count << "(" << (int)(consensus_ratio * 100) << "%)"
-              << " " << (good_fit ? "GOOD" : "WEAK")
-              << " | Front: " << front_clearance << "m\n";
+    // Print clear RANSAC wall detection results (suppressed '[RANSAC]' tagged output)
+    // std::cout << "[RANSAC] " 
+    //           << " Wall: " << wall_side 
+    //           << " " << wall_orientation
+    //           << " | Dist: " << std::abs(perpendicular_distance) << "m"
+    //           << " Angle: " << angle_deg << "°"
+    //           << " | Points: " << scan_data.size() 
+    //           << " Inliers: " << inlier_count << "(" << (int)(consensus_ratio * 100) << "% )"
+    //           << " " << (good_fit ? "GOOD" : "WEAK")
+    //           << " | Front: " << front_clearance << "m\n";
     
     follower->computeAndCommand(control_result);
 }

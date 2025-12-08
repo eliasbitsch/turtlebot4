@@ -78,6 +78,7 @@ private:
     double prev_angle_error_;
     double prev_time_;
     uint64_t cmd_sequence_;
+    double prev_linear_x_;  // For velocity ramping/smoothing
 
     // State machine
     FollowerState state_;
