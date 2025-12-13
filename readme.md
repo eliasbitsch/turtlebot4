@@ -75,3 +75,29 @@ colcon build
 source install/setup.bash
 ros2 launch turtlebot4_sim turtlebot4_sim.launch.py
 ```
+
+# GMapping starten
+
+## Build
+
+```bash
+make
+```
+
+## Ausführen
+
+```bash
+./bin/core
+./bin/mapping
+```
+
+## Ausgabe
+
+- `data/data.txt` - Sensordaten
+- `map.pgm` - Generierte Karte
+
+## Karte anzeigen
+
+```bash
+eog map.pgm
+```
