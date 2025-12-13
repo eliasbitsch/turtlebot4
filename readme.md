@@ -76,28 +76,137 @@ source install/setup.bash
 ros2 launch turtlebot4_sim turtlebot4_sim.launch.py
 ```
 
-# GMapping starten
+---
 
-## Build
+## Build and Run - Complete System
+
+### 1. Start Docker Container
 
 ```bash
+cd /home/elias/turtlebot4
+docker compose up -d
+docker exec -it turtlebot4-dev bash
+```
+
+### 2. Build All Components
+
+```bash
+cd /workspace/workspace
+make clean
+make
+
+# Build linear controller
+cd linear_control
+make
+
+# Build joystick
+cd ../joystick
 make
 ```
 
-## Ausführen
+### 3. Start Rosbridge on Robot
+
+**SSH to robot first:**
+```bash
+ssh ubuntu@192.168.100.100
+# password: turtlebot4
+
+# Start rosbridge websocket server
+ros2 run rosbridge_server rosbridge_websocket --ros-args -p address:="0.0.0.0" -p port:=9090
+```
+
+### 4. Start Bridge (in Docker container)
+
+**Terminal 1:**
+```bash
+cd /workspace/workspace
+./build/turtlebot4_bridge 192.168.100.100
+```
+
+You should see:
+```
+[Rosbridge] Connected to ws://192.168.100.100:9090
+[Stats] scan: XXX odom: XXX bumper: XXX
+```
+
+### 5. Start Xbox Controller (Joystick)
+
+**Terminal 2:**
+```bash
+cd /workspace/workspace/joystick
+./joy_shm
+```
+
+Move left stick to control robot:
+- Up/Down: Forward/Backward (linear_x)
+- Left/Right: Turn (angular_z)
+
+### 6. Start Linear Controller (Optional)
+
+**Alternative to joystick - drives to waypoints:**
+```bash
+cd /workspace/workspace/linear_control
+./linear_controller
+```
+
+### 7. Start Wall Follower (Optional)
+
+**For autonomous navigation:**
+```bash
+cd /workspace/workspace/wall_follower
+./wall_follower
+```
+
+### 8. Monitor Shared Memory
+
+**Terminal 3 (optional debug):**
+```bash
+cd /workspace/workspace
+./build/shm_monitor
+```
+
+Shows real-time cmd_vel and odom data from shared memory.
+
+---
+
+## GMapping (SLAM)
+
+### Build
 
 ```bash
+cd /workspace/gmapping
+make
+```
+
+### Run
+
+**Terminal 1:**
+```bash
 ./bin/core
+```
+
+**Terminal 2:**
+```bash
 ./bin/mapping
 ```
 
-## Ausgabe
+### Output
 
-- `data/data.txt` - Sensordaten
-- `map.pgm` - Generierte Karte
+- `data/data.txt` - Sensor data
+- `map.pgm` - Generated map
 
-## Karte anzeigen
+### View Map
 
 ```bash
 eog map.pgm
 ```
+
+---
+
+## Quick Start Summary
+
+**Minimal setup to drive robot with Xbox controller:**
+
+1. Docker → Start bridge
+2. Docker → Start joy_shm
+3. Move Xbox controller left stick
