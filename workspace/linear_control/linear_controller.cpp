@@ -1,11 +1,12 @@
 // Linear Controller for TurtleBot4
-// Reads odometry from shared memory, computes control, writes cmd_vel to shared memory
+// Reads goal from /shm_goal, odometry from /shm_odom
+// Computes control and writes cmd_vel to /shm_cmd_vel
+//
 // The turtlebot4_bridge forwards cmd_vel to the robot via rosbridge
 //
 // Usage:
-//   ./linear_controller <goal_x> <goal_y> <goal_theta>
-//   ./linear_controller 1.0 0.0 0.0    # drive 1m forward
-//   ./linear_controller 0.0 0.0 1.57   # rotate 90 degrees
+//   ./linear_controller              # reads goals from shared memory
+//   ./linear_controller 1.0 0.0 0.0  # one-shot mode: drive to goal then exit
 
 #include "../include/shared_memory.hpp"
 #include "../include/datatypes.hpp"
@@ -34,7 +35,6 @@ double normalizeAngle(double a) {
 
 // Convert quaternion to yaw angle
 double quaternionToYaw(double x, double y, double z, double w) {
-    // yaw = atan2(2*(w*z + x*y), 1 - 2*(y*y + z*z))
     double siny_cosp = 2.0 * (w * z + x * y);
     double cosy_cosp = 1.0 - 2.0 * (y * y + z * z);
     return std::atan2(siny_cosp, cosy_cosp);
@@ -71,7 +71,6 @@ void computeControl(double current_x, double current_y, double current_theta,
         out_angular = (k_alpha * alpha) + (k_beta * beta);
     } else {
         // At position, rotate to final orientation
-        // Use simple proportional control on angle error
         double angle_error = normalizeAngle(goal_theta - current_theta);
         out_linear = 0.0;
         out_angular = 2.0 * angle_error;  // Simple P-control for final rotation
@@ -88,30 +87,31 @@ int main(int argc, char** argv) {
     std::signal(SIGINT, signal_handler);
     std::signal(SIGTERM, signal_handler);
 
-    // Parse arguments
-    if (argc < 4) {
-        std::cout << "Usage: " << argv[0] << " <goal_x> <goal_y> <goal_theta>\n";
-        std::cout << "Examples:\n";
-        std::cout << "  " << argv[0] << " 1.0 0.0 0.0    # drive 1m forward\n";
-        std::cout << "  " << argv[0] << " 0.0 0.0 1.57   # rotate 90 degrees left\n";
-        std::cout << "  " << argv[0] << " 1.0 1.0 0.0    # drive to (1,1)\n";
-        return 1;
+    // Check if one-shot mode (goal from command line)
+    bool one_shot_mode = (argc >= 4);
+    double one_shot_x = 0, one_shot_y = 0, one_shot_theta = 0;
+
+    if (one_shot_mode) {
+        one_shot_x = std::stod(argv[1]);
+        one_shot_y = std::stod(argv[2]);
+        one_shot_theta = std::stod(argv[3]);
+        std::cout << "One-shot mode: goal (" << one_shot_x << ", " << one_shot_y
+                  << ", " << one_shot_theta << ")\n";
+    } else {
+        std::cout << "Shared memory mode: reading goals from /shm_goal\n";
     }
 
-    double goal_x = std::stod(argv[1]);
-    double goal_y = std::stod(argv[2]);
-    double goal_theta = std::stod(argv[3]);
-
     // Control gains (tuned for smoother driving)
-    double kp_linear = 1.5;   // was 3.0 - reduced for less aggressive acceleration
-    double k_alpha = 3.0;     // was 8.0 - main cause of oscillation, reduced significantly
-    double k_beta = -0.8;     // was -1.5 - reduced for smoother final orientation
+    double kp_linear = 1.5;
+    double k_alpha = 3.0;
+    double k_beta = -0.8;
     double pos_threshold = 0.05;
     double ang_threshold = 0.1;
 
     // Open shared memory
     std::unique_ptr<turtlebot4::SharedMemory<turtlebot4::SharedOdometry>> odom_shm;
     std::unique_ptr<turtlebot4::SharedMemory<turtlebot4::SharedCmdVel>> cmd_shm;
+    std::unique_ptr<turtlebot4::SharedMemory<turtlebot4::SharedGoal>> goal_shm;
 
     try {
         odom_shm = std::make_unique<turtlebot4::SharedMemory<turtlebot4::SharedOdometry>>(
@@ -133,9 +133,34 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    // Goal shared memory - create if not exists, open if exists
+    try {
+        goal_shm = std::make_unique<turtlebot4::SharedMemory<turtlebot4::SharedGoal>>(
+            turtlebot4::shm_names::GOAL, true);  // create=true
+        std::cout << "Created/Opened: " << turtlebot4::shm_names::GOAL << "\n";
+    } catch (const std::exception& e) {
+        std::cerr << "Cannot create/open goal shm: " << e.what() << "\n";
+        return 1;
+    }
+
+    // If one-shot mode, write the goal to shared memory
+    if (one_shot_mode) {
+        goal_shm->update([&](turtlebot4::SharedGoal& goal) {
+            goal.x = one_shot_x;
+            goal.y = one_shot_y;
+            goal.theta = one_shot_theta;
+            goal.active = true;
+            goal.reached = false;
+            goal.goal_id = 1;
+            goal.sequence++;
+            auto now = std::chrono::system_clock::now().time_since_epoch();
+            goal.timestamp_sec = std::chrono::duration_cast<std::chrono::seconds>(now).count();
+            goal.timestamp_nanosec = std::chrono::duration_cast<std::chrono::nanoseconds>(now).count() % 1000000000;
+        });
+    }
+
     std::cout << std::fixed << std::setprecision(3);
-    std::cout << "\nGoal: (" << goal_x << ", " << goal_y << ", " << goal_theta << ")\n";
-    std::cout << "Press Ctrl+C to stop\n\n";
+    std::cout << "\nPress Ctrl+C to stop\n\n";
 
     // Wait for first odom reading
     std::cout << "Waiting for odometry data...\n";
@@ -157,9 +182,55 @@ int main(int argc, char** argv) {
 
     // Control loop
     uint64_t cmd_seq = 0;
+    uint64_t last_goal_seq = 0;
+    uint32_t current_goal_id = 0;
     const auto dt = std::chrono::milliseconds(50);  // 20 Hz control rate
 
     while (g_running) {
+        // Read current goal from shared memory
+        double goal_x = 0, goal_y = 0, goal_theta = 0;
+        bool goal_active = false;
+        bool goal_reached = false;
+        uint32_t goal_id = 0;
+        uint64_t goal_seq = 0;
+
+        goal_shm->read([&](const turtlebot4::SharedGoal& goal) {
+            goal_x = goal.x;
+            goal_y = goal.y;
+            goal_theta = goal.theta;
+            goal_active = goal.active;
+            goal_reached = goal.reached;
+            goal_id = goal.goal_id;
+            goal_seq = goal.sequence;
+        });
+
+        // Check for new goal
+        if (goal_seq != last_goal_seq) {
+            if (goal_active && goal_id != current_goal_id) {
+                std::cout << "\n[NEW GOAL] id=" << goal_id
+                          << " pos=(" << goal_x << ", " << goal_y << ", " << goal_theta << ")\n";
+                current_goal_id = goal_id;
+            }
+            last_goal_seq = goal_seq;
+        }
+
+        // If no active goal, send zero velocity and wait
+        if (!goal_active || goal_reached) {
+            cmd_shm->update([&](turtlebot4::SharedCmdVel& cmd) {
+                cmd.linear_x = 0.0;
+                cmd.linear_y = 0.0;
+                cmd.linear_z = 0.0;
+                cmd.angular_x = 0.0;
+                cmd.angular_y = 0.0;
+                cmd.angular_z = 0.0;
+                cmd.sequence = ++cmd_seq;
+                cmd.new_command = true;
+            });
+            std::cout << "\rWaiting for goal...                                      " << std::flush;
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            continue;
+        }
+
         // Read current pose from shared memory
         double x = 0, y = 0, theta = 0;
         odom_shm->read([&](const turtlebot4::SharedOdometry& odom) {
@@ -196,29 +267,26 @@ int main(int argc, char** argv) {
         double dx = goal_x - x;
         double dy = goal_y - y;
         double dist = std::sqrt(dx * dx + dy * dy);
-
-        // Also read sequence to see if odom is updating
         uint64_t odom_seq = odom_shm->sequence();
 
-        std::cout << "\rpose=(" << std::setw(6) << x << ", " << std::setw(6) << y
+        std::cout << "\rgoal=" << goal_id << " pose=(" << std::setw(6) << x << ", " << std::setw(6) << y
                   << ", " << std::setw(5) << theta << ") "
                   << "v=" << std::setw(5) << v << " w=" << std::setw(5) << w
-                  << " dist=" << std::setw(5) << dist
-                  << " seq=" << odom_seq << "   " << std::flush;
+                  << " dist=" << std::setw(5) << dist << "   " << std::flush;
 
         if (reached) {
-            std::cout << "\n\nGoal reached!\n";
-            break;
-        }
+            std::cout << "\n\n[GOAL REACHED] id=" << goal_id << "\n";
 
-        // Debug: print more info every 20 iterations
-        static int dbg_cnt = 0;
-        if (++dbg_cnt % 20 == 0) {
-            double angle_to_goal = std::atan2(goal_y - y, goal_x - x);
-            double alpha = normalizeAngle(angle_to_goal - theta);
-            double beta = normalizeAngle(goal_theta - theta - alpha);
-            std::cout << "\n  [DBG] alpha=" << alpha << " beta=" << beta
-                      << " pos_thr=0.05 ang_thr=0.1\n";
+            // Mark goal as reached in shared memory
+            goal_shm->update([](turtlebot4::SharedGoal& goal) {
+                goal.reached = true;
+                goal.active = false;
+            });
+
+            // In one-shot mode, exit after reaching goal
+            if (one_shot_mode) {
+                break;
+            }
         }
 
         std::this_thread::sleep_for(dt);

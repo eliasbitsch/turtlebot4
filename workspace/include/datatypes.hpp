@@ -100,6 +100,30 @@ struct SharedScan {
         sequence(0), ranges{}, num_ranges(0) {}
 };
 
+// Shared Memory: Goal Pose (WaypointManager -> Controller)
+// Name: /shm_goal
+struct SharedGoal {
+    // Target position
+    double x;
+    double y;
+    double theta;  // Target orientation (yaw)
+
+    // Goal status
+    bool active;           // true if goal is active
+    bool reached;          // true if controller has reached the goal
+    uint32_t goal_id;      // ID to track which goal this is
+
+    // Timestamp when goal was set
+    int32_t timestamp_sec;
+    uint32_t timestamp_nanosec;
+
+    // Sequence number for detecting updates
+    uint64_t sequence;
+
+    SharedGoal() : x(0), y(0), theta(0), active(false), reached(false),
+        goal_id(0), timestamp_sec(0), timestamp_nanosec(0), sequence(0) {}
+};
+
 // Shared Memory: Occupancy Grid Map (Mapper -> Navigation)
 // Name: /shm_map
 constexpr uint32_t MAP_MAX_WIDTH = 1024;
@@ -242,6 +266,7 @@ namespace shm_names {
     constexpr const char* ODOM = "/shm_odom";
     constexpr const char* SCAN = "/shm_scan";
     constexpr const char* CMD_VEL = "/shm_cmd_vel";
+    constexpr const char* GOAL = "/shm_goal";
     constexpr const char* MAP = "/shm_map";
 }
 

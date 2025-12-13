@@ -26,18 +26,20 @@ int main(int argc, char* argv[]) {
     std::cout << "=== Shared Memory Monitor (Lock-Free) ===" << std::endl;
     std::cout << "Press Ctrl+C to exit\n" << std::endl;
 
-    bool monitor_odom = true, monitor_cmd = true, monitor_scan = true;
+    bool monitor_odom = true, monitor_cmd = true, monitor_scan = true, monitor_goal = true;
 
     if (argc > 1) {
         std::string arg = argv[1];
-        if (arg == "odom") { monitor_cmd = false; monitor_scan = false; }
-        else if (arg == "cmd") { monitor_odom = false; monitor_scan = false; }
-        else if (arg == "scan") { monitor_odom = false; monitor_cmd = false; }
+        if (arg == "odom") { monitor_cmd = false; monitor_scan = false; monitor_goal = false; }
+        else if (arg == "cmd") { monitor_odom = false; monitor_scan = false; monitor_goal = false; }
+        else if (arg == "scan") { monitor_odom = false; monitor_cmd = false; monitor_goal = false; }
+        else if (arg == "goal") { monitor_odom = false; monitor_cmd = false; monitor_scan = false; }
     }
 
     std::unique_ptr<turtlebot4::SharedMemory<turtlebot4::SharedOdometry>> odom_shm;
     std::unique_ptr<turtlebot4::SharedMemory<turtlebot4::SharedCmdVel>> cmd_shm;
     std::unique_ptr<turtlebot4::SharedMemory<turtlebot4::SharedScan>> scan_shm;
+    std::unique_ptr<turtlebot4::SharedMemory<turtlebot4::SharedGoal>> goal_shm;
 
     if (monitor_odom) {
         try {
@@ -72,12 +74,23 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if (!monitor_odom && !monitor_cmd && !monitor_scan) {
+    if (monitor_goal) {
+        try {
+            goal_shm = std::make_unique<turtlebot4::SharedMemory<turtlebot4::SharedGoal>>(
+                turtlebot4::shm_names::GOAL, false);
+            std::cout << "Opened: " << turtlebot4::shm_names::GOAL << std::endl;
+        } catch (const std::exception& e) {
+            std::cerr << "Cannot open goal shm: " << e.what() << std::endl;
+            monitor_goal = false;
+        }
+    }
+
+    if (!monitor_odom && !monitor_cmd && !monitor_scan && !monitor_goal) {
         std::cerr << "No shared memory available" << std::endl;
         return 1;
     }
 
-    uint64_t last_odom_seq = 0, last_cmd_seq = 0, last_scan_seq = 0;
+    uint64_t last_odom_seq = 0, last_cmd_seq = 0, last_scan_seq = 0, last_goal_seq = 0;
 
     while (g_running) {
         std::cout << "\033[2J\033[H"; // Clear screen
@@ -148,6 +161,22 @@ int main(int argc, char* argv[]) {
                     std::cout << "  Min dist:  " << std::setw(6) << min_dist << " m\n";
                 }
                 std::cout << "\n";
+            });
+        }
+
+        if (monitor_goal && goal_shm) {
+            goal_shm->read([&](const turtlebot4::SharedGoal& goal) {
+                std::cout << "[GOAL] seq=" << goal.sequence;
+                if (goal.sequence != last_goal_seq) {
+                    std::cout << " (updated)";
+                    last_goal_seq = goal.sequence;
+                }
+                std::cout << " id=" << goal.goal_id << "\n"
+                          << "  Position:  x=" << std::setw(8) << goal.x
+                          << "  y=" << std::setw(8) << goal.y << "\n"
+                          << "  Theta:     " << std::setw(8) << goal.theta << " rad\n"
+                          << "  Active:    " << (goal.active ? "yes" : "no")
+                          << "  Reached:   " << (goal.reached ? "yes" : "no") << "\n\n";
             });
         }
 
