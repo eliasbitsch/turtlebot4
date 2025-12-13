@@ -1,3 +1,5 @@
+// --- Philip Stix ---
+
 // Waypoint Manager for TurtleBot4
 // Sends a sequence of waypoints to /shm_goal for the linear controller
 //
