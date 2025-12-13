@@ -1,3 +1,5 @@
+// --- Philip Stix ---
+
 // Standalone Joystick -> Shared Memory Controller
 // Writes to SeqLock-protected shared memory compatible with turtlebot4 bridge
 
