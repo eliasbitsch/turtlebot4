@@ -1,3 +1,5 @@
+// --- Philip Stix ---
+
 #include <iostream>
 #include <vector>
 #include <cmath>
